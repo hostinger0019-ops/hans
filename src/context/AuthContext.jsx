@@ -5,7 +5,7 @@ const AuthContext = createContext(null)
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return !!authAPI.getToken()
+    return !!authAPI.getToken() || localStorage.getItem('tarik_admin_auth') === 'true'
   })
   const [adminUser, setAdminUser] = useState(() => {
     const saved = localStorage.getItem('tarik_admin_user')
@@ -13,23 +13,25 @@ export const AuthProvider = ({ children }) => {
   })
   const [loginLoading, setLoginLoading] = useState(false)
 
-  // Verify token on mount
+  // Verify token silently in background — don't log out on network errors
   useEffect(() => {
     const verifyToken = async () => {
       const token = authAPI.getToken()
-      if (!token) return
+      if (!token && !localStorage.getItem('tarik_admin_auth')) return
+
+      // Trust local state — user stays logged in
+      if (!token && localStorage.getItem('tarik_admin_auth') === 'true') {
+        setIsAuthenticated(true)
+        return
+      }
 
       try {
         const user = await authAPI.getMe()
-        setAdminUser(user)
-        setIsAuthenticated(true)
+        setAdminUser(prev => ({ ...prev, ...user }))
         localStorage.setItem('tarik_admin_user', JSON.stringify(user))
       } catch {
-        // Token expired or invalid
-        authAPI.clearToken()
-        setIsAuthenticated(false)
-        setAdminUser(null)
-        localStorage.removeItem('tarik_admin_user')
+        // Silently ignore — keep user logged in with local data
+        // Only explicit logout should clear the session
       }
     }
     verifyToken()
