@@ -1,0 +1,195 @@
+/* ============================================
+   REELS MINI BAR
+   ============================================ */
+.reels-mini {
+  padding: var(--space-3xl) 0;
+  background: var(--color-bg-secondary);
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.reels-mini__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-xl);
+}
+
+.reels-mini__title-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.reels-mini__icon {
+  color: var(--color-gold);
+  display: flex;
+  align-items: center;
+}
+
+.reels-mini__title {
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-bold);
+  color: var(--color-white);
+}
+
+.reels-mini__badge {
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: var(--color-white);
+  font-size: 10px;
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-wider);
+  animation: pulse 2s ease infinite;
+}
+
+.reels-mini__arrows {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.reels-mini__arrow {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.reels-mini__arrow:hover {
+  background: var(--color-gold);
+  color: var(--color-black);
+  border-color: var(--color-gold);
+}
+
+/* Track */
+.reels-mini__track {
+  display: flex;
+  gap: var(--space-lg);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 0 var(--space-xl);
+  scroll-snap-type: x mandatory;
+}
+
+.reels-mini__track::-webkit-scrollbar {
+  display: none;
+}
+
+/* Individual Reel Thumb */
+.reels-mini__item {
+  flex-shrink: 0;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  scroll-snap-align: start;
+  transition: transform var(--transition-normal);
+}
+
+.reels-mini__item:hover {
+  transform: scale(1.05);
+}
+
+.reels-mini__ring {
+  padding: 3px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--color-gold), #e74c3c, #9b59b6, var(--color-gold));
+  background-size: 300% 300%;
+  animation: gradientShift 4s ease infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.reels-mini__thumb {
+  position: relative;
+  width: 130px;
+  height: 200px;
+  border-radius: calc(var(--radius-lg) - 2px);
+  overflow: hidden;
+  background: var(--color-bg-card);
+}
+
+.reels-mini__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.reels-mini__item:hover .reels-mini__thumb img {
+  transform: scale(1.1);
+}
+
+.reels-mini__play-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.reels-mini__item:hover .reels-mini__play-overlay {
+  opacity: 1;
+}
+
+.reels-mini__gradient {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+  pointer-events: none;
+}
+
+.reels-mini__product-name {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  right: 10px;
+  font-size: 11px;
+  font-weight: var(--fw-semibold);
+  color: var(--color-white);
+  line-height: 1.3;
+  z-index: 1;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .reels-mini__thumb {
+    width: 110px;
+    height: 170px;
+  }
+
+  .reels-mini__track {
+    gap: var(--space-md);
+    padding: 0 var(--space-md);
+  }
+
+  .reels-mini__arrows {
+    display: none;
+  }
+}

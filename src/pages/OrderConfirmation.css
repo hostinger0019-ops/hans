@@ -1,0 +1,79 @@
+/* ============================================
+   ORDER CONFIRMATION
+   ============================================ */
+.order-confirm {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  padding: calc(var(--nav-height) + 36px + var(--space-xl)) var(--space-xl) var(--space-4xl);
+}
+
+.order-confirm__content { max-width: 520px; width: 100%; text-align: center; }
+
+/* Success Icon */
+.order-confirm__icon { position: relative; display: inline-flex; align-items: center; justify-content: center; margin-bottom: var(--space-xl); color: #2ecc71; animation: confirmBounce 0.6s cubic-bezier(0.35, 0, 0.25, 1); }
+
+.order-confirm__icon-ring {
+  position: absolute; width: 100px; height: 100px; border-radius: 50%;
+  border: 2px solid rgba(46,204,113,0.3);
+  animation: confirmRing 1.5s ease-out forwards;
+}
+.order-confirm__icon-ring--2 { animation-delay: 0.2s; border-color: rgba(201,169,110,0.2); }
+
+@keyframes confirmBounce {
+  0% { transform: scale(0); opacity: 0; }
+  60% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes confirmRing {
+  0% { transform: scale(0.5); opacity: 1; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+.order-confirm__title { font-family: var(--font-display); font-size: var(--fs-3xl); font-weight: var(--fw-bold); color: var(--color-white); margin-bottom: var(--space-md); }
+
+.order-confirm__desc { font-size: var(--fs-base); color: var(--color-text-secondary); line-height: var(--lh-relaxed); margin-bottom: var(--space-2xl); }
+
+/* Order ID */
+.order-confirm__order-id {
+  padding: var(--space-lg); background: var(--color-bg-card); border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg); margin-bottom: var(--space-2xl); display: inline-flex; flex-direction: column; gap: 4px;
+}
+.order-confirm__order-id span { font-size: var(--fs-xs); color: var(--color-text-muted); }
+.order-confirm__id-copy { display: flex; align-items: center; gap: var(--space-sm); }
+.order-confirm__id-copy strong { font-family: var(--font-primary); font-size: var(--fs-lg); color: var(--color-gold); letter-spacing: var(--ls-wider); }
+.order-confirm__id-copy button { color: var(--color-text-muted); cursor: pointer; background: none; border: none; display: flex; transition: color var(--transition-fast); }
+.order-confirm__id-copy button:hover { color: var(--color-gold); }
+
+/* Timeline */
+.order-confirm__timeline {
+  display: flex; align-items: flex-start; justify-content: center;
+  gap: 0; margin-bottom: var(--space-2xl);
+  padding: var(--space-xl); background: var(--color-bg-card); border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.order-confirm__timeline-step { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 100px; }
+.order-confirm__timeline-dot {
+  width: 36px; height: 36px; border-radius: var(--radius-full);
+  background: var(--color-bg-tertiary); border: 2px solid var(--color-border);
+  display: flex; align-items: center; justify-content: center; color: var(--color-text-muted);
+}
+.order-confirm__timeline-step--done .order-confirm__timeline-dot { background: var(--color-gold); border-color: var(--color-gold); color: var(--color-black); }
+.order-confirm__timeline-label { font-size: var(--fs-xs); font-weight: var(--fw-semibold); color: var(--color-white); }
+.order-confirm__timeline-time { font-size: 10px; color: var(--color-text-muted); }
+.order-confirm__timeline-step--done .order-confirm__timeline-label { color: var(--color-gold); }
+
+.order-confirm__timeline-line { width: 60px; height: 2px; background: var(--color-border); margin-top: 18px; flex-shrink: 0; }
+
+.order-confirm__email-note { font-size: var(--fs-sm); color: var(--color-text-muted); margin-bottom: var(--space-2xl); }
+
+/* Actions */
+.order-confirm__actions { display: flex; flex-direction: column; gap: var(--space-sm); align-items: center; }
+.order-confirm__actions .btn { min-width: 250px; }
+
+@media (max-width: 480px) {
+  .order-confirm__timeline { flex-direction: column; align-items: flex-start; }
+  .order-confirm__timeline-step { flex-direction: row; }
+  .order-confirm__timeline-line { width: 2px; height: 24px; margin: 0 0 0 17px; }
+  .order-confirm__title { font-size: var(--fs-2xl); }
+}
