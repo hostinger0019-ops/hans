@@ -207,10 +207,17 @@ ul, ol {
 }
 
 .text-gradient {
-  background: var(--color-gold-gradient);
+  background: linear-gradient(135deg, #c9a96e 0%, #f0d48a 30%, #c9a96e 60%, #dfc088 100%);
+  background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  animation: textGradientShimmer 4s ease infinite;
+}
+
+@keyframes textGradientShimmer {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
 }
 
 /* Button Styles */

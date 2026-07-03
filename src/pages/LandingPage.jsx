@@ -230,6 +230,14 @@ const LandingPage = () => {
     setCurrentTestimonial(prev => (prev - 1 + testimonials.length) % testimonials.length)
   }
 
+  // Auto-rotate testimonials
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTestimonial(prev => (prev + 1) % testimonials.length)
+    }, 5000)
+    return () => clearInterval(timer)
+  }, [currentTestimonial])
+
   return (
     <>
     <main className="landing" id="landing-page">
