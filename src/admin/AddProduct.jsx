@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useProducts } from '../context/ProductContext'
+import { uploadAPI } from '../services/api'
 import {
   Upload,
   X,
@@ -87,6 +88,7 @@ const AddProduct = () => {
           url: e.target.result,
           name: file.name,
           size: file.size,
+          file: file,  // Keep original file for backend upload
         }])
       }
       reader.readAsDataURL(file)
@@ -152,23 +154,42 @@ const AddProduct = () => {
   }
 
   /* ─── Submit ─── */
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!validate()) return
 
     setSaving(true)
-    setTimeout(() => {
-      addProduct({
+    try {
+      // Upload images to backend
+      const imageUrls = []
+      for (const img of images) {
+        if (img.file) {
+          try {
+            const result = await uploadAPI.upload(img.file)
+            imageUrls.push(result.url)
+          } catch {
+            // Fallback to base64 if upload fails
+            imageUrls.push(img.url)
+          }
+        } else {
+          imageUrls.push(img.url)
+        }
+      }
+
+      await addProduct({
         ...form,
         price: parseFloat(form.price),
         comparePrice: form.comparePrice ? parseFloat(form.comparePrice) : null,
         stock: parseInt(form.stock),
-        images: images.map(img => img.url),
+        images: imageUrls,
         videos: videos.map(v => v.url),
       })
       setSaving(false)
       navigate('/admin/products')
-    }, 600)
+    } catch (err) {
+      console.error('Failed to save product:', err)
+      setSaving(false)
+    }
   }
 
   const formatFileSize = (bytes) => {
