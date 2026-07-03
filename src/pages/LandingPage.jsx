@@ -377,9 +377,9 @@ const LandingPage = () => {
                 <span className="collection-card__tag">New Season</span>
                 <h3 className="collection-card__title">Men's Collection</h3>
                 <p className="collection-card__desc">Discover bold essentials & streetwear</p>
-                <a href="#" className="collection-card__link">
+                <Link to="/shop" className="collection-card__link">
                   Explore Now <ArrowUpRight size={16} />
-                </a>
+                </Link>
               </div>
             </div>
 
@@ -389,9 +389,9 @@ const LandingPage = () => {
                 <span className="collection-card__tag">Trending</span>
                 <h3 className="collection-card__title">Women's Collection</h3>
                 <p className="collection-card__desc">Elegant styles for every moment</p>
-                <a href="#" className="collection-card__link">
+                <Link to="/shop" className="collection-card__link">
                   Explore Now <ArrowUpRight size={16} />
-                </a>
+                </Link>
               </div>
             </div>
 
@@ -405,9 +405,9 @@ const LandingPage = () => {
                 <span className="collection-card__tag">Must Have</span>
                 <h3 className="collection-card__title">Accessories</h3>
                 <p className="collection-card__desc">Complete your look with premium accessories</p>
-                <a href="#" className="collection-card__link">
+                <Link to="/shop" className="collection-card__link">
                   Explore Now <ArrowUpRight size={16} />
-                </a>
+                </Link>
               </div>
             </div>
           </div>
@@ -553,9 +553,9 @@ const LandingPage = () => {
               </div>
             </div>
 
-            <a href="#" className="btn btn-primary btn-lg" id="shop-sale-btn">
+            <Link to="/shop" className="btn btn-primary btn-lg" id="shop-sale-btn">
               Shop the Sale <ArrowRight size={18} />
-            </a>
+            </Link>
           </div>
         </div>
       </section>
