@@ -34,4 +34,13 @@ for (const route of routes) {
 // Also create 404.html at dist root
 writeFileSync(join(distDir, '404.html'), indexHtml);
 
+// Copy api-proxy.php into dist for Hostinger deployment
+try {
+  const proxyFile = readFileSync(join(__dirname, 'api-proxy.php'));
+  writeFileSync(join(distDir, 'api-proxy.php'), proxyFile);
+  console.log('✅ Copied api-proxy.php to dist/');
+} catch (e) {
+  console.warn('⚠️ api-proxy.php not found, skipping');
+}
+
 console.log(`✅ Created ${routes.length} route folders + 404.html in dist/`);
