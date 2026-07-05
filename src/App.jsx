@@ -8,6 +8,7 @@ import Navbar from './components/Navbar'
 import LandingPage from './pages/LandingPage'
 import ProductDetail from './pages/ProductDetail'
 import ShopPage from './pages/ShopPage'
+import CategoryPage from './pages/CategoryPage'
 import CheckoutPage from './pages/CheckoutPage'
 import OrderConfirmation from './pages/OrderConfirmation'
 import Footer from './components/Footer'
@@ -47,6 +48,9 @@ function AppContent() {
       {/* Storefront */}
       <Route path="/" element={<StorefrontLayout />} />
       <Route path="/shop" element={<ShopPage />} />
+      <Route path="/collections" element={<CategoryPage />} />
+      <Route path="/collections/:category" element={<CategoryPage />} />
+      <Route path="/new-arrivals" element={<CategoryPage />} />
       <Route path="/product/:id" element={<ProductDetail />} />
       <Route path="/checkout" element={<CheckoutPage />} />
       <Route path="/order-confirmed" element={<OrderConfirmation />} />
