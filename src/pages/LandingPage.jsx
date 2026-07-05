@@ -272,7 +272,7 @@ const LandingPage = () => {
             <a href="#collections" className="btn btn-primary btn-lg" id="hero-shop-btn">
               Shop Collection <ArrowRight size={18} />
             </a>
-            <a href="#trending" className="btn btn-outline btn-lg" id="hero-explore-btn">
+            <a href="/new-arrivals" className="btn btn-outline btn-lg" id="hero-explore-btn">
               Explore New Arrivals
             </a>
           </div>
@@ -377,7 +377,7 @@ const LandingPage = () => {
                 <span className="collection-card__tag">New Season</span>
                 <h3 className="collection-card__title">Men's Collection</h3>
                 <p className="collection-card__desc">Discover bold essentials & streetwear</p>
-                <Link to="/shop" className="collection-card__link">
+                <Link to="/collections/men" className="collection-card__link">
                   Explore Now <ArrowUpRight size={16} />
                 </Link>
               </div>
@@ -389,7 +389,7 @@ const LandingPage = () => {
                 <span className="collection-card__tag">Trending</span>
                 <h3 className="collection-card__title">Women's Collection</h3>
                 <p className="collection-card__desc">Elegant styles for every moment</p>
-                <Link to="/shop" className="collection-card__link">
+                <Link to="/collections/women" className="collection-card__link">
                   Explore Now <ArrowUpRight size={16} />
                 </Link>
               </div>
@@ -405,7 +405,7 @@ const LandingPage = () => {
                 <span className="collection-card__tag">Must Have</span>
                 <h3 className="collection-card__title">Accessories</h3>
                 <p className="collection-card__desc">Complete your look with premium accessories</p>
-                <Link to="/shop" className="collection-card__link">
+                <Link to="/collections" className="collection-card__link">
                   Explore Now <ArrowUpRight size={16} />
                 </Link>
               </div>
