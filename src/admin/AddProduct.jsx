@@ -147,9 +147,11 @@ const AddProduct = () => {
     const errs = {}
     if (!form.name.trim()) errs.name = 'Product name is required'
     if (!form.price || parseFloat(form.price) <= 0) errs.price = 'Valid price is required'
-    if (!form.stock || parseInt(form.stock) < 0) errs.stock = 'Stock quantity is required'
-    if (images.length === 0) errs.images = 'At least one image is required'
+    if (form.stock === '' || parseInt(form.stock) < 0) errs.stock = 'Stock quantity is required'
     setErrors(errs)
+    if (Object.keys(errs).length > 0) {
+      alert('Please fill in: ' + Object.values(errs).join(', '))
+    }
     return Object.keys(errs).length === 0
   }
 
@@ -188,6 +190,7 @@ const AddProduct = () => {
       navigate('/admin/products')
     } catch (err) {
       console.error('Failed to save product:', err)
+      alert('Failed to save product: ' + (err.message || 'Unknown error'))
       setSaving(false)
     }
   }
