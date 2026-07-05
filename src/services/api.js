@@ -1,9 +1,20 @@
 /**
  * Tarik Clothing — API Service Layer
  * Connects the React frontend to the FastAPI backend on GCP.
+ * On HTTPS (Hostinger), uses PHP proxy to avoid mixed-content blocking.
  */
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://34.132.216.147:6000';
+const GCP_BACKEND = 'http://34.132.216.147:6000';
+const IS_PRODUCTION = window.location.protocol === 'https:';
+
+// Build the correct URL depending on environment
+function buildUrl(endpoint) {
+  if (IS_PRODUCTION) {
+    // Route through PHP proxy on same domain
+    return `/api-proxy.php?path=${encodeURIComponent(endpoint)}`;
+  }
+  return `${GCP_BACKEND}${endpoint}`;
+}
 
 // ─── Auth Token Management ───
 
@@ -22,13 +33,12 @@ function clearToken() {
 // ─── Fetch Wrapper ───
 
 async function apiFetch(endpoint, options = {}) {
-  const url = `${API_BASE}${endpoint}`;
+  const url = buildUrl(endpoint);
   const headers = {
     'Content-Type': 'application/json',
     ...options.headers,
   };
 
-  // Attach auth token if available
   const token = getToken();
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
@@ -39,7 +49,6 @@ async function apiFetch(endpoint, options = {}) {
     headers,
   });
 
-  // Handle 401 — token expired
   if (response.status === 401) {
     clearToken();
   }
@@ -139,7 +148,9 @@ export const uploadAPI = {
     formData.append('file', file);
 
     const token = getToken();
-    const response = await fetch(`${API_BASE}/api/upload`, {
+    const url = buildUrl('/api/upload');
+    
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -153,10 +164,9 @@ export const uploadAPI = {
     }
 
     const data = await response.json();
-    // Return full URL for the uploaded file
     return {
       ...data,
-      url: `${API_BASE}${data.url}`,
+      url: IS_PRODUCTION ? `${GCP_BACKEND}${data.url}` : `${GCP_BACKEND}${data.url}`,
     };
   },
 };
