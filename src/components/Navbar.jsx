@@ -62,10 +62,10 @@ const Navbar = () => {
           <ul className="navbar__links" id="navbar-links">
             <li><a href="/" className="navbar__link navbar__link--active">Home</a></li>
             <li><a href="/shop" className="navbar__link">Shop</a></li>
-            <li><a href="#collections" className="navbar__link">Collections</a></li>
-            <li><a href="#trending" className="navbar__link">New Arrivals</a></li>
-            <li><a href="/shop" className="navbar__link">Men</a></li>
-            <li><a href="/shop" className="navbar__link">Women</a></li>
+            <li><a href="/shop" className="navbar__link">Collections</a></li>
+            <li><a href="/shop" className="navbar__link">New Arrivals</a></li>
+            <li><a href="/shop?category=Men" className="navbar__link">Men</a></li>
+            <li><a href="/shop?category=Women" className="navbar__link">Women</a></li>
             <li><a href="/shop" className="navbar__link navbar__link--highlight">Sale</a></li>
           </ul>
 
