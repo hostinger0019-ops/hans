@@ -1,5 +1,9 @@
-/* Sample reels data — will be replaced by admin-uploaded content later */
-const reelsData = [
+/**
+ * Reels Data — Loads admin-uploaded reels from localStorage,
+ * falls back to sample data if none exist.
+ */
+
+const sampleReels = [
   {
     id: 1,
     videoUrl: 'https://videos.pexels.com/video-files/5705370/5705370-uhd_1440_2560_25fps.mp4',
@@ -80,4 +84,39 @@ const reelsData = [
   },
 ]
 
+/**
+ * Get reels — merges admin-uploaded reels with sample reels.
+ * Admin reels appear first.
+ */
+export function getReels() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('tarik_reels') || '[]')
+    // Convert admin-uploaded reels to the format expected by ReelsMiniBar/ReelsViewer
+    const adminReels = saved.map(reel => ({
+      id: reel.id,
+      videoUrl: reel.videoUrl,
+      thumbnail: reel.videoUrl, // Use video URL as thumbnail (browser will show first frame)
+      productName: reel.productName || '',
+      productPrice: reel.productPrice ? parseFloat(reel.productPrice) : 0,
+      productId: null,
+      username: '@tarikclothing',
+      caption: reel.caption || '',
+      likes: 0,
+      comments: 0,
+      shares: 0,
+    }))
+
+    // If admin has uploaded reels, show those first + sample reels
+    if (adminReels.length > 0) {
+      return [...adminReels, ...sampleReels]
+    }
+
+    return sampleReels
+  } catch {
+    return sampleReels
+  }
+}
+
+// Default export for backward compatibility
+const reelsData = getReels()
 export default reelsData

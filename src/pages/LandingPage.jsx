@@ -25,7 +25,7 @@ import collectionMen from '../assets/images/collection-men.png'
 import collectionWomen from '../assets/images/collection-women.png'
 import ReelsMiniBar from '../components/ReelsMiniBar'
 import ReelsViewer from '../components/ReelsViewer'
-import reelsData from '../data/reelsData'
+import { getReels } from '../data/reelsData'
 import QuickViewModal from '../components/QuickViewModal'
 import { motion, useScroll, useTransform, useSpring, animate } from 'framer-motion'
 import './LandingPage.css'
@@ -224,6 +224,14 @@ const LandingPage = () => {
   const [reelsViewerOpen, setReelsViewerOpen] = useState(false)
   const [reelsStartIndex, setReelsStartIndex] = useState(0)
   const [quickViewProduct, setQuickViewProduct] = useState(null)
+  const [reelsData, setReelsData] = useState(getReels)
+
+  // Refresh reels when page gains focus (in case admin uploaded new reels)
+  useEffect(() => {
+    const handleFocus = () => setReelsData(getReels())
+    window.addEventListener('focus', handleFocus)
+    return () => window.removeEventListener('focus', handleFocus)
+  }, [])
 
   // Scroll-linked animations (parallax + progress bar)
   const { scrollY, scrollYProgress } = useScroll()
