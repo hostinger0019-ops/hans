@@ -1,12 +1,23 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Film, Plus, Upload, X, Play, Trash2, Link } from 'lucide-react'
+import { uploadAPI } from '../services/api'
 import './ReelsManager.css'
 
 const ReelsManager = () => {
   const videoInputRef = useRef(null)
-  const [reels, setReels] = useState([])
+  const [reels, setReels] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('tarik_reels') || '[]')
+    } catch { return [] }
+  })
   const [showUpload, setShowUpload] = useState(false)
   const [newReel, setNewReel] = useState({ caption: '', productName: '', productPrice: '', video: null, videoUrl: '' })
+  const [uploading, setUploading] = useState(false)
+
+  // Persist reels to localStorage
+  useEffect(() => {
+    localStorage.setItem('tarik_reels', JSON.stringify(reels))
+  }, [reels])
 
   const handleVideoSelect = (e) => {
     const file = e.target.files[0]
@@ -19,15 +30,27 @@ const ReelsManager = () => {
     }
   }
 
-  const handleSaveReel = () => {
-    if (!newReel.videoUrl || !newReel.caption) return
-    setReels(prev => [...prev, {
-      id: Date.now(),
-      ...newReel,
-      createdAt: new Date().toISOString().split('T')[0],
-    }])
-    setNewReel({ caption: '', productName: '', productPrice: '', video: null, videoUrl: '' })
-    setShowUpload(false)
+  const handleSaveReel = async () => {
+    if (!newReel.video || !newReel.caption) return
+    setUploading(true)
+    try {
+      // Upload video to Hostinger
+      const result = await uploadAPI.upload(newReel.video)
+      setReels(prev => [...prev, {
+        id: Date.now(),
+        caption: newReel.caption,
+        productName: newReel.productName,
+        productPrice: newReel.productPrice,
+        videoUrl: result.url,
+        createdAt: new Date().toISOString().split('T')[0],
+      }])
+      setNewReel({ caption: '', productName: '', productPrice: '', video: null, videoUrl: '' })
+      setShowUpload(false)
+    } catch (err) {
+      alert('Failed to upload video: ' + err.message)
+    } finally {
+      setUploading(false)
+    }
   }
 
   const deleteReel = (id) => {
@@ -107,8 +130,8 @@ const ReelsManager = () => {
 
             <div className="reels-manager__modal-footer">
               <button className="btn btn-outline" onClick={() => setShowUpload(false)}>Cancel</button>
-              <button className="btn btn-primary" onClick={handleSaveReel} disabled={!newReel.videoUrl || !newReel.caption}>
-                <Upload size={16} /> Publish Reel
+              <button className="btn btn-primary" onClick={handleSaveReel} disabled={!newReel.video || !newReel.caption || uploading}>
+                {uploading ? 'Uploading...' : <><Upload size={16} /> Publish Reel</>}
               </button>
             </div>
           </div>

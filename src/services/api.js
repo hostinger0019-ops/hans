@@ -140,35 +140,41 @@ export const ordersAPI = {
   stats: () => apiFetch('/api/orders/stats'),
 };
 
-// ─── Upload API ───
+// ─── Hostinger Upload API (Fast — files served directly from Hostinger) ───
+
+const HOSTINGER_UPLOAD_KEY = 'tarik-upload-2024-secure';
 
 export const uploadAPI = {
+  /**
+   * Upload a file to Hostinger via the PHP upload script.
+   * Files are saved to /uploads/images/ or /uploads/reels/ on Hostinger.
+   * Returns { url, filename, type, size }
+   */
   upload: async (file) => {
     const formData = new FormData();
     formData.append('file', file);
 
-    const token = getToken();
-    const url = buildUrl('/api/upload');
-    
-    const response = await fetch(url, {
+    // Always upload to Hostinger (same domain in production, or direct URL in dev)
+    const uploadUrl = IS_PRODUCTION
+      ? '/upload.php'
+      : 'https://tarikclothing.com/upload.php';
+
+    const response = await fetch(uploadUrl, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        'X-Upload-Key': HOSTINGER_UPLOAD_KEY,
       },
       body: formData,
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ detail: 'Upload failed' }));
-      throw new Error(error.detail || 'Upload failed');
+      const error = await response.json().catch(() => ({ error: 'Upload failed' }));
+      throw new Error(error.error || 'Upload failed');
     }
 
-    const data = await response.json();
-    return {
-      ...data,
-      url: IS_PRODUCTION ? `${GCP_BACKEND}${data.url}` : `${GCP_BACKEND}${data.url}`,
-    };
+    return response.json();
   },
 };
 
 export default { authAPI, productsAPI, ordersAPI, uploadAPI };
+

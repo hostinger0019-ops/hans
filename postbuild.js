@@ -45,4 +45,13 @@ try {
   console.warn('⚠️ api-proxy.php not found, skipping');
 }
 
+// Copy upload.php into dist for Hostinger file uploads
+try {
+  const uploadFile = readFileSync(join(__dirname, 'upload.php'));
+  writeFileSync(join(distDir, 'upload.php'), uploadFile);
+  console.log('✅ Copied upload.php to dist/');
+} catch (e) {
+  console.warn('⚠️ upload.php not found, skipping');
+}
+
 console.log(`✅ Created ${routes.length} route folders + 404.html in dist/`);

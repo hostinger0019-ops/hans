@@ -162,19 +162,40 @@ const AddProduct = () => {
 
     setSaving(true)
     try {
-      // Upload images to backend
+      // Upload images to Hostinger
       const imageUrls = []
       for (const img of images) {
         if (img.file) {
           try {
             const result = await uploadAPI.upload(img.file)
             imageUrls.push(result.url)
-          } catch {
-            // Fallback to base64 if upload fails
-            imageUrls.push(img.url)
+          } catch (err) {
+            console.error('Image upload failed:', err)
+            alert('Failed to upload image: ' + img.name + '. Please try again.')
+            setSaving(false)
+            return
           }
-        } else {
+        } else if (img.url && !img.url.startsWith('data:')) {
+          // Already a proper URL (not base64)
           imageUrls.push(img.url)
+        }
+      }
+
+      // Upload videos to Hostinger
+      const videoUrls = []
+      for (const vid of videos) {
+        if (vid.file) {
+          try {
+            const result = await uploadAPI.upload(vid.file)
+            videoUrls.push(result.url)
+          } catch (err) {
+            console.error('Video upload failed:', err)
+            alert('Failed to upload video: ' + vid.name + '. Please try again.')
+            setSaving(false)
+            return
+          }
+        } else if (vid.url && !vid.url.startsWith('blob:')) {
+          videoUrls.push(vid.url)
         }
       }
 
@@ -184,7 +205,7 @@ const AddProduct = () => {
         comparePrice: form.comparePrice ? parseFloat(form.comparePrice) : null,
         stock: parseInt(form.stock),
         images: imageUrls,
-        videos: videos.map(v => v.url),
+        videos: videoUrls,
       })
       setSaving(false)
       navigate('/admin/products')
