@@ -60,13 +60,6 @@ const CategoryPage = () => {
     <>
       <Navbar />
       <div className="catpage">
-        {/* Header */}
-        <div className="catpage__header">
-          <h1 className="catpage__title">{categoryTitle}</h1>
-          <p className="catpage__count">
-            {loading ? 'Loading...' : `${filtered.length} product${filtered.length !== 1 ? 's' : ''}`}
-          </p>
-        </div>
 
         {/* Product Grid */}
         {loading ? (
