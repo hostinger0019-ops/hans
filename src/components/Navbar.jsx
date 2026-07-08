@@ -61,12 +61,8 @@ const Navbar = () => {
           {/* Navigation Links */}
           <ul className="navbar__links" id="navbar-links">
             <li><a href="/" className="navbar__link navbar__link--active">Home</a></li>
-            <li><a href="/shop" className="navbar__link">Shop</a></li>
-            <li><a href="/collections" className="navbar__link">Collections</a></li>
-            <li><a href="/new-arrivals" className="navbar__link">New Arrivals</a></li>
             <li><a href="/collections/men" className="navbar__link">Men</a></li>
             <li><a href="/collections/women" className="navbar__link">Women</a></li>
-            <li><a href="/shop" className="navbar__link navbar__link--highlight">Sale</a></li>
           </ul>
 
           {/* Action Icons */}
@@ -127,12 +123,8 @@ const Navbar = () => {
           </div>
           <ul className="mobile-menu__links">
             <li><a href="/" className="mobile-menu__link" onClick={() => setIsMobileMenuOpen(false)}>Home</a></li>
-            <li><a href="/shop" className="mobile-menu__link" onClick={() => setIsMobileMenuOpen(false)}>Shop</a></li>
-            <li><a href="/collections" className="mobile-menu__link" onClick={() => setIsMobileMenuOpen(false)}>Collections</a></li>
-            <li><a href="/new-arrivals" className="mobile-menu__link" onClick={() => setIsMobileMenuOpen(false)}>New Arrivals</a></li>
             <li><a href="/collections/men" className="mobile-menu__link" onClick={() => setIsMobileMenuOpen(false)}>Men</a></li>
             <li><a href="/collections/women" className="mobile-menu__link" onClick={() => setIsMobileMenuOpen(false)}>Women</a></li>
-            <li><a href="/shop" className="mobile-menu__link mobile-menu__link--highlight" onClick={() => setIsMobileMenuOpen(false)}>Sale</a></li>
           </ul>
           <div className="mobile-menu__footer">
             <a href="#" className="mobile-menu__footer-link"><User size={18} /> My Account</a>

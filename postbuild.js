@@ -19,12 +19,9 @@ const routes = [
   'admin/reels',
   'admin/analytics',
   'admin/settings',
-  'shop',
-  'collections',
   'collections/men',
   'collections/women',
   'collections/unisex',
-  'new-arrivals',
   'checkout',
   'order-confirmed',
 ];
