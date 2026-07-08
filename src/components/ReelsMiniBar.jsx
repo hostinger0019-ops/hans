@@ -41,26 +41,41 @@ const ReelsMiniBar = ({ reels, onReelClick }) => {
       </div>
 
       <div className="reels-mini__track" ref={scrollRef}>
-        {reels.map((reel, index) => (
-          <button
-            key={reel.id}
-            className="reels-mini__item"
-            onClick={() => onReelClick(index)}
-            aria-label={`Play reel: ${reel.productName}`}
-            id={`reel-thumb-${reel.id}`}
-          >
-            <div className="reels-mini__ring">
-              <div className="reels-mini__thumb">
-                <img src={reel.thumbnail} alt={reel.productName} loading="lazy" />
-                <div className="reels-mini__play-overlay">
-                  <Play size={20} fill="white" />
+        {reels.map((reel, index) => {
+          const isVideoThumb = reel.thumbnail && /\.(mp4|mov|webm)(\?|$)/i.test(reel.thumbnail)
+
+          return (
+            <button
+              key={reel.id}
+              className="reels-mini__item"
+              onClick={() => onReelClick(index)}
+              aria-label={`Play reel: ${reel.productName}`}
+              id={`reel-thumb-${reel.id}`}
+            >
+              <div className="reels-mini__ring">
+                <div className="reels-mini__thumb">
+                  {isVideoThumb ? (
+                    <video
+                      src={reel.thumbnail}
+                      muted
+                      playsInline
+                      preload="metadata"
+                      onLoadedData={(e) => { e.target.currentTime = 0.5 }}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  ) : (
+                    <img src={reel.thumbnail} alt={reel.productName} loading="lazy" />
+                  )}
+                  <div className="reels-mini__play-overlay">
+                    <Play size={20} fill="white" />
+                  </div>
+                  <div className="reels-mini__gradient"></div>
+                  <span className="reels-mini__product-name">{reel.productName}</span>
                 </div>
-                <div className="reels-mini__gradient"></div>
-                <span className="reels-mini__product-name">{reel.productName}</span>
               </div>
-            </div>
-          </button>
-        ))}
+            </button>
+          )
+        })}
       </div>
     </div>
   )
