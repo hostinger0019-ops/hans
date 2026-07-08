@@ -83,55 +83,81 @@ const CategoryPage = () => {
           </div>
         ) : (
           <div className="catpage__grid">
-            {filtered.map(product => (
-              <div className="catpage__card" key={product.id}>
-                {/* Image */}
-                <Link to={`/product/${product.id}`} className="catpage__card-img-wrap">
-                  <img
-                    src={product.images?.[0] || ''}
-                    alt={product.name}
-                    className="catpage__card-img"
-                    loading="lazy"
-                  />
-                  {/* Wishlist */}
-                  <button
-                    className={`catpage__wish ${wishlist.has(product.id) ? 'catpage__wish--active' : ''}`}
-                    onClick={(e) => { e.preventDefault(); toggleWishlist(product.id) }}
-                  >
-                    <Heart size={20} fill={wishlist.has(product.id) ? '#fff' : 'none'} />
-                  </button>
-                </Link>
+            {filtered.map(product => {
+              const discount = product.comparePrice && product.comparePrice > product.price
+                ? Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)
+                : 0
 
-                {/* Info */}
-                <div className="catpage__card-info">
-                  {product.subcategory && (
-                    <span className="catpage__card-sub">{product.subcategory}</span>
-                  )}
-                  <Link to={`/product/${product.id}`} className="catpage__card-name">
-                    {product.name}
-                  </Link>
-                  <div className="catpage__card-price-row">
-                    <span className="catpage__card-currency">INR</span>
-                    <span className="catpage__card-price">
-                      {product.price?.toLocaleString('en-IN')}
-                    </span>
-                    {product.comparePrice && product.comparePrice > product.price && (
-                      <span className="catpage__card-old">
-                        ₹{product.comparePrice.toLocaleString('en-IN')}
+              return (
+                <div className="catpage__card" key={product.id}>
+                  {/* Image */}
+                  <Link to={`/product/${product.id}`} className="catpage__card-img-wrap">
+                    <img
+                      src={product.images?.[0] || ''}
+                      alt={product.name}
+                      className="catpage__card-img"
+                      loading="lazy"
+                    />
+                    {/* Sale Badge */}
+                    {discount > 0 && (
+                      <span className="catpage__card-badge catpage__card-badge--sale">
+                        {discount}% Off
                       </span>
                     )}
-                  </div>
+                    {/* Wishlist */}
+                    <button
+                      className={`catpage__wish ${wishlist.has(product.id) ? 'catpage__wish--active' : ''}`}
+                      onClick={(e) => { e.preventDefault(); toggleWishlist(product.id) }}
+                    >
+                      <Heart size={18} fill={wishlist.has(product.id) ? '#fff' : 'none'} />
+                    </button>
+                  </Link>
 
-                  {/* Add to Cart */}
-                  <button
-                    className={`catpage__add-btn ${addedItems.has(product.id) ? 'catpage__add-btn--added' : ''}`}
-                    onClick={() => handleAddToCart(product)}
-                  >
-                    {addedItems.has(product.id) ? '✓ Added' : 'Add to Cart'}
-                  </button>
+                  {/* Info */}
+                  <div className="catpage__card-info">
+                    {product.subcategory && (
+                      <span className="catpage__card-sub">{product.subcategory}</span>
+                    )}
+                    <Link to={`/product/${product.id}`} className="catpage__card-name">
+                      {product.name}
+                    </Link>
+                    <div className="catpage__card-price-row">
+                      <span className="catpage__card-currency">₹</span>
+                      <span className="catpage__card-price">
+                        {product.price?.toLocaleString('en-IN')}
+                      </span>
+                      {product.comparePrice && product.comparePrice > product.price && (
+                        <>
+                          <span className="catpage__card-old">
+                            ₹{product.comparePrice.toLocaleString('en-IN')}
+                          </span>
+                          <span className="catpage__card-discount">
+                            {discount}% off
+                          </span>
+                        </>
+                      )}
+                    </div>
+
+                    {/* Size Tags */}
+                    {product.sizes?.length > 0 && (
+                      <div className="catpage__card-sizes">
+                        {product.sizes.map(size => (
+                          <span key={size} className="catpage__card-size">{size}</span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Add to Cart */}
+                    <button
+                      className={`catpage__add-btn ${addedItems.has(product.id) ? 'catpage__add-btn--added' : ''}`}
+                      onClick={() => handleAddToCart(product)}
+                    >
+                      {addedItems.has(product.id) ? '✓ Added' : 'Add to Cart'}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>
