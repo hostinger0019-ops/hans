@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   X,
   Heart,
@@ -17,6 +18,7 @@ import {
 import './ReelsViewer.css'
 
 const ReelsViewer = ({ reels, startIndex = 0, onClose }) => {
+  const navigate = useNavigate()
   const [currentIndex, setCurrentIndex] = useState(startIndex)
   const [isMuted, setIsMuted] = useState(true)
   const [isPlaying, setIsPlaying] = useState(true)
@@ -289,18 +291,18 @@ const ReelsViewer = ({ reels, startIndex = 0, onClose }) => {
                   <span className="reels-viewer__product-price">₹{currentReel.productPrice?.toLocaleString?.() || currentReel.productPrice}</span>
                 </div>
               </div>
-              <a
-                href={currentReel.productId ? `/product/${currentReel.productId}` : '#'}
+              <button
                 className="reels-viewer__shop-btn"
                 id="reel-shop-now"
-                onClick={(e) => {
+                onClick={() => {
                   if (currentReel.productId) {
                     onClose()
+                    navigate(`/product/${currentReel.productId}`)
                   }
                 }}
               >
                 Shop Now <ArrowRight size={14} />
-              </a>
+              </button>
             </div>
           </div>
         </div>
