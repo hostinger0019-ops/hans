@@ -43,9 +43,10 @@
 
 .reels-manager__form-field { margin-bottom: var(--space-lg); }
 .reels-manager__form-field label { display: block; font-size: var(--fs-sm); color: var(--color-text-secondary); margin-bottom: var(--space-sm); font-weight: var(--fw-medium); }
-.reels-manager__form-field input, .reels-manager__form-field textarea { width: 100%; padding: 10px 14px; background: var(--color-bg-tertiary); border: 1px solid var(--color-border); border-radius: var(--radius-md); color: var(--color-white); font-size: var(--fs-sm); outline: none; resize: vertical; }
-.reels-manager__form-field input:focus, .reels-manager__form-field textarea:focus { border-color: var(--color-gold); }
+.reels-manager__form-field input, .reels-manager__form-field textarea, .reels-manager__form-field select { width: 100%; padding: 10px 14px; background: var(--color-bg-tertiary); border: 1px solid var(--color-border); border-radius: var(--radius-md); color: var(--color-white); font-size: var(--fs-sm); outline: none; resize: vertical; }
+.reels-manager__form-field input:focus, .reels-manager__form-field textarea:focus, .reels-manager__form-field select:focus { border-color: var(--color-gold); }
 .reels-manager__form-field input::placeholder, .reels-manager__form-field textarea::placeholder { color: var(--color-text-muted); }
+.reels-manager__form-field select option { background: #1a1a1a; color: #fff; padding: 8px; }
 .reels-manager__form-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
 
 @media (max-width: 640px) {
