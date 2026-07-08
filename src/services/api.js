@@ -175,6 +175,22 @@ export const uploadAPI = {
     return response.json();
   },
 };
+// ─── Reels API ───
 
-export default { authAPI, productsAPI, ordersAPI, uploadAPI };
+export const reelsAPI = {
+  list: () => apiFetch('/api/reels'),
+
+  create: (reelData) =>
+    apiFetch('/api/reels', {
+      method: 'POST',
+      body: JSON.stringify(reelData),
+    }),
+
+  delete: (id) =>
+    apiFetch(`/api/reels/${id}`, {
+      method: 'DELETE',
+    }),
+};
+
+export default { authAPI, productsAPI, ordersAPI, uploadAPI, reelsAPI };
 

@@ -25,7 +25,8 @@ import collectionMen from '../assets/images/collection-men.png'
 import collectionWomen from '../assets/images/collection-women.png'
 import ReelsMiniBar from '../components/ReelsMiniBar'
 import ReelsViewer from '../components/ReelsViewer'
-import { getReels } from '../data/reelsData'
+import { sampleReels } from '../data/reelsData'
+import { reelsAPI } from '../services/api'
 import QuickViewModal from '../components/QuickViewModal'
 import { motion, useScroll, useTransform, useSpring, animate } from 'framer-motion'
 import './LandingPage.css'
@@ -224,13 +225,18 @@ const LandingPage = () => {
   const [reelsViewerOpen, setReelsViewerOpen] = useState(false)
   const [reelsStartIndex, setReelsStartIndex] = useState(0)
   const [quickViewProduct, setQuickViewProduct] = useState(null)
-  const [reelsData, setReelsData] = useState(getReels)
+  const [reelsData, setReelsData] = useState(sampleReels)
 
-  // Refresh reels when page gains focus (in case admin uploaded new reels)
+  // Fetch reels from backend API
   useEffect(() => {
-    const handleFocus = () => setReelsData(getReels())
-    window.addEventListener('focus', handleFocus)
-    return () => window.removeEventListener('focus', handleFocus)
+    reelsAPI.list()
+      .then(data => {
+        const adminReels = data.reels || []
+        if (adminReels.length > 0) {
+          setReelsData([...adminReels, ...sampleReels])
+        }
+      })
+      .catch(() => {}) // Keep sample reels on error
   }, [])
 
   // Scroll-linked animations (parallax + progress bar)

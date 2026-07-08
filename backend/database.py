@@ -70,6 +70,18 @@ class Admin(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
+class Reel(Base):
+    __tablename__ = "reels"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    video_url = Column(Text, nullable=False)
+    caption = Column(Text, default="")
+    product_id = Column(Integer, nullable=True)
+    product_name = Column(String(255), default="")
+    product_price = Column(Float, default=0.0)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
 # ─── DB Helpers ───
 
 def create_tables():

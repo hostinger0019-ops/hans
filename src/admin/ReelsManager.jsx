@@ -1,25 +1,23 @@
 import { useState, useRef, useEffect } from 'react'
 import { Film, Plus, Upload, X, Play, Trash2, Link } from 'lucide-react'
-import { uploadAPI } from '../services/api'
+import { uploadAPI, reelsAPI } from '../services/api'
 import { useProducts } from '../context/ProductContext'
 import './ReelsManager.css'
 
 const ReelsManager = () => {
   const videoInputRef = useRef(null)
   const { products } = useProducts()
-  const [reels, setReels] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem('tarik_reels') || '[]')
-    } catch { return [] }
-  })
+  const [reels, setReels] = useState([])
   const [showUpload, setShowUpload] = useState(false)
   const [newReel, setNewReel] = useState({ caption: '', productId: '', video: null, videoUrl: '' })
   const [uploading, setUploading] = useState(false)
 
-  // Persist reels to localStorage
+  // Fetch reels from backend on mount
   useEffect(() => {
-    localStorage.setItem('tarik_reels', JSON.stringify(reels))
-  }, [reels])
+    reelsAPI.list()
+      .then(data => setReels(data.reels || []))
+      .catch(err => console.error('Failed to load reels:', err))
+  }, [])
 
   const handleVideoSelect = (e) => {
     const file = e.target.files[0]
@@ -41,15 +39,20 @@ const ReelsManager = () => {
 
       // Upload video to Hostinger
       const result = await uploadAPI.upload(newReel.video)
-      setReels(prev => [...prev, {
-        id: Date.now(),
+
+      // Save reel to backend database
+      await reelsAPI.create({
+        video_url: result.url,
         caption: newReel.caption,
-        productName: selectedProduct?.name || '',
-        productPrice: selectedProduct?.price || 0,
-        productId: selectedProduct?.id || null,
-        videoUrl: result.url,
-        createdAt: new Date().toISOString().split('T')[0],
-      }])
+        product_id: selectedProduct?.id || null,
+        product_name: selectedProduct?.name || '',
+        product_price: selectedProduct?.price || 0,
+      })
+
+      // Refresh reels list
+      const data = await reelsAPI.list()
+      setReels(data.reels || [])
+
       setNewReel({ caption: '', productId: '', video: null, videoUrl: '' })
       setShowUpload(false)
     } catch (err) {
@@ -59,8 +62,13 @@ const ReelsManager = () => {
     }
   }
 
-  const deleteReel = (id) => {
-    setReels(prev => prev.filter(r => r.id !== id))
+  const deleteReel = async (id) => {
+    try {
+      await reelsAPI.delete(id)
+      setReels(prev => prev.filter(r => r.id !== id))
+    } catch (err) {
+      alert('Failed to delete reel: ' + err.message)
+    }
   }
 
   return (
