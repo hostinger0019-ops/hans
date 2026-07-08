@@ -27,6 +27,7 @@ import ReelsMiniBar from '../components/ReelsMiniBar'
 import ReelsViewer from '../components/ReelsViewer'
 import reelsData from '../data/reelsData'
 import QuickViewModal from '../components/QuickViewModal'
+import { motion, useScroll, useTransform, useSpring, animate } from 'framer-motion'
 import './LandingPage.css'
 
 /* ─── Sample Product Data ─── */
@@ -189,6 +190,23 @@ const useCountdown = (targetHours = 23) => {
   return time
 }
 
+/* ─── Animated Counter ─── */
+const Counter = ({ to, suffix = '', decimals = 0, start }) => {
+  const [value, setValue] = useState(0)
+
+  useEffect(() => {
+    if (!start) return
+    const controls = animate(0, to, {
+      duration: 2,
+      ease: [0.16, 1, 0.3, 1],
+      onUpdate: (v) => setValue(v),
+    })
+    return () => controls.stop()
+  }, [start, to])
+
+  return <>{value.toFixed(decimals)}{suffix}</>
+}
+
 const LandingPage = () => {
   const [heroRef, heroInView] = useInView()
   const [trustRef, trustInView] = useInView()
@@ -206,6 +224,27 @@ const LandingPage = () => {
   const [reelsViewerOpen, setReelsViewerOpen] = useState(false)
   const [reelsStartIndex, setReelsStartIndex] = useState(0)
   const [quickViewProduct, setQuickViewProduct] = useState(null)
+
+  // Scroll-linked animations (parallax + progress bar)
+  const { scrollY, scrollYProgress } = useScroll()
+  const heroBgY = useTransform(scrollY, [0, 900], [0, 180])
+  const heroContentY = useTransform(scrollY, [0, 700], [0, 90])
+  const heroContentOpacity = useTransform(scrollY, [0, 550], [1, 0])
+  const progressScaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 })
+
+  // Hero entrance choreography
+  const heroContainer = {
+    hidden: {},
+    show: { transition: { staggerChildren: 0.13, delayChildren: 0.15 } },
+  }
+  const heroItem = {
+    hidden: { y: 44, opacity: 0 },
+    show: { y: 0, opacity: 1, transition: { duration: 1, ease: [0.16, 1, 0.3, 1] } },
+  }
+  const heroLine = {
+    hidden: { y: '112%' },
+    show: { y: '0%', transition: { duration: 1.1, ease: [0.16, 1, 0.3, 1] } },
+  }
 
   const openReelsViewer = (index) => {
     setReelsStartIndex(index)
@@ -240,6 +279,8 @@ const LandingPage = () => {
 
   return (
     <>
+    <motion.div className="scroll-progress" style={{ scaleX: progressScaleX }} />
+
     <main className="landing" id="landing-page">
 
       {/* ═══════════════════════════════════════
@@ -251,54 +292,89 @@ const LandingPage = () => {
         id="hero-section"
       >
         <div className="hero__bg">
-          <img src={heroBanner} alt="Tarik Clothing Hero" className="hero__bg-image" />
+          <motion.img
+            src={heroBanner}
+            alt="Tarik Clothing Hero"
+            className="hero__bg-image"
+            style={{ y: heroBgY }}
+            initial={{ scale: 1.18, filter: 'blur(10px)' }}
+            animate={{ scale: 1.05, filter: 'blur(0px)' }}
+            transition={{ duration: 2.4, ease: [0.16, 1, 0.3, 1] }}
+          />
           <div className="hero__bg-overlay"></div>
           <div className="hero__bg-grain"></div>
         </div>
 
-        <div className="hero__content container">
-          <div className="hero__badge">
+        <motion.div
+          className="hero__content container"
+          style={{ y: heroContentY, opacity: heroContentOpacity }}
+          variants={heroContainer}
+          initial="hidden"
+          animate="show"
+        >
+          <motion.div className="hero__badge" variants={heroItem}>
             <Sparkles size={14} />
             <span>New Summer Collection 2026</span>
-          </div>
+          </motion.div>
           <h1 className="hero__title">
-            <span className="hero__title-line">Elevate</span>
-            <span className="hero__title-line hero__title-line--accent">Your Style</span>
+            <span className="hero__title-mask">
+              <motion.span className="hero__title-line" variants={heroLine}>Elevate</motion.span>
+            </span>
+            <span className="hero__title-mask">
+              <motion.span className="hero__title-line hero__title-line--accent" variants={heroLine}>Your Style</motion.span>
+            </span>
           </h1>
-          <p className="hero__subtitle">
+          <motion.p className="hero__subtitle" variants={heroItem}>
             Discover premium clothing that defines who you are. Handcrafted with passion, designed for the bold.
-          </p>
-          <div className="hero__cta">
-            <a href="#collections" className="btn btn-primary btn-lg" id="hero-shop-btn">
+          </motion.p>
+          <motion.div className="hero__cta" variants={heroItem}>
+            <motion.a
+              href="#collections"
+              className="btn btn-primary btn-lg"
+              id="hero-shop-btn"
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.97 }}
+            >
               Shop Collection <ArrowRight size={18} />
-            </a>
-            <a href="/new-arrivals" className="btn btn-outline btn-lg" id="hero-explore-btn">
+            </motion.a>
+            <motion.a
+              href="/new-arrivals"
+              className="btn btn-outline btn-lg"
+              id="hero-explore-btn"
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.97 }}
+            >
               Explore New Arrivals
-            </a>
-          </div>
+            </motion.a>
+          </motion.div>
 
-          <div className="hero__stats">
+          <motion.div className="hero__stats" variants={heroItem}>
             <div className="hero__stat">
-              <span className="hero__stat-number">10K+</span>
+              <span className="hero__stat-number"><Counter to={10} suffix="K+" start={true} /></span>
               <span className="hero__stat-label">Happy Customers</span>
             </div>
             <div className="hero__stat-divider"></div>
             <div className="hero__stat">
-              <span className="hero__stat-number">500+</span>
+              <span className="hero__stat-number"><Counter to={500} suffix="+" start={true} /></span>
               <span className="hero__stat-label">Unique Designs</span>
             </div>
             <div className="hero__stat-divider"></div>
             <div className="hero__stat">
-              <span className="hero__stat-number">4.9</span>
+              <span className="hero__stat-number"><Counter to={4.9} decimals={1} start={true} /></span>
               <span className="hero__stat-label">Average Rating</span>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
-        <div className="hero__scroll-indicator">
+        <motion.div
+          className="hero__scroll-indicator"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.6, duration: 0.8 }}
+        >
           <span>Scroll to explore</span>
           <div className="hero__scroll-line"></div>
-        </div>
+        </motion.div>
       </section>
 
       {/* ═══════════════════════════════════════
