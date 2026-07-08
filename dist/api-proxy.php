@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 // Backend URL
-$backend = 'http://34.132.216.147:6000';
+$backend = 'http://35.244.35.135:6000';
 
 // Get the API path from query string
 $path = isset($_GET['path']) ? $_GET['path'] : '/';

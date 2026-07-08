@@ -4,7 +4,7 @@
  * On HTTPS (Hostinger), uses PHP proxy to avoid mixed-content blocking.
  */
 
-const GCP_BACKEND = 'http://34.132.216.147:6000';
+const GCP_BACKEND = 'http://35.244.35.135:6000';
 const IS_PRODUCTION = window.location.protocol === 'https:';
 
 // Build the correct URL depending on environment
