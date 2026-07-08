@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext } from 'react'
+import { Link } from 'react-router-dom'
 import { ShoppingBag, Search, User, Menu, X, Heart } from 'lucide-react'
 import CartContext from '../context/CartContext'
 import './Navbar.css'
@@ -52,17 +53,17 @@ const Navbar = () => {
           </button>
 
           {/* Logo */}
-          <a href="/" className="navbar__logo" id="navbar-logo">
+          <Link to="/" className="navbar__logo" id="navbar-logo">
             <span className="navbar__logo-text">TARIK</span>
             <span className="navbar__logo-divider"></span>
             <span className="navbar__logo-sub">CLOTHING</span>
-          </a>
+          </Link>
 
           {/* Navigation Links */}
           <ul className="navbar__links" id="navbar-links">
-            <li><a href="/" className="navbar__link navbar__link--active">Home</a></li>
-            <li><a href="/collections/men" className="navbar__link">Men</a></li>
-            <li><a href="/collections/women" className="navbar__link">Women</a></li>
+            <li><Link to="/" className="navbar__link navbar__link--active">Home</Link></li>
+            <li><Link to="/collections/men" className="navbar__link">Men</Link></li>
+            <li><Link to="/collections/women" className="navbar__link">Women</Link></li>
           </ul>
 
           {/* Action Icons */}
@@ -122,9 +123,9 @@ const Navbar = () => {
             </button>
           </div>
           <ul className="mobile-menu__links">
-            <li><a href="/" className="mobile-menu__link" onClick={() => setIsMobileMenuOpen(false)}>Home</a></li>
-            <li><a href="/collections/men" className="mobile-menu__link" onClick={() => setIsMobileMenuOpen(false)}>Men</a></li>
-            <li><a href="/collections/women" className="mobile-menu__link" onClick={() => setIsMobileMenuOpen(false)}>Women</a></li>
+            <li><Link to="/" className="mobile-menu__link" onClick={() => setIsMobileMenuOpen(false)}>Home</Link></li>
+            <li><Link to="/collections/men" className="mobile-menu__link" onClick={() => setIsMobileMenuOpen(false)}>Men</Link></li>
+            <li><Link to="/collections/women" className="mobile-menu__link" onClick={() => setIsMobileMenuOpen(false)}>Women</Link></li>
           </ul>
           <div className="mobile-menu__footer">
             <a href="#" className="mobile-menu__footer-link"><User size={18} /> My Account</a>
