@@ -286,10 +286,19 @@ const ReelsViewer = ({ reels, startIndex = 0, onClose }) => {
                 <ShoppingBag size={16} />
                 <div>
                   <span className="reels-viewer__product-name">{currentReel.productName}</span>
-                  <span className="reels-viewer__product-price">₹{currentReel.productPrice.toLocaleString()}</span>
+                  <span className="reels-viewer__product-price">₹{currentReel.productPrice?.toLocaleString?.() || currentReel.productPrice}</span>
                 </div>
               </div>
-              <a href="#" className="reels-viewer__shop-btn" id="reel-shop-now">
+              <a
+                href={currentReel.productId ? `/product/${currentReel.productId}` : '#'}
+                className="reels-viewer__shop-btn"
+                id="reel-shop-now"
+                onClick={(e) => {
+                  if (currentReel.productId) {
+                    onClose()
+                  }
+                }}
+              >
                 Shop Now <ArrowRight size={14} />
               </a>
             </div>

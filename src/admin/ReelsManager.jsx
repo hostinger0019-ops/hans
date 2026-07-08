@@ -1,17 +1,19 @@
 import { useState, useRef, useEffect } from 'react'
 import { Film, Plus, Upload, X, Play, Trash2, Link } from 'lucide-react'
 import { uploadAPI } from '../services/api'
+import { useProducts } from '../context/ProductContext'
 import './ReelsManager.css'
 
 const ReelsManager = () => {
   const videoInputRef = useRef(null)
+  const { products } = useProducts()
   const [reels, setReels] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem('tarik_reels') || '[]')
     } catch { return [] }
   })
   const [showUpload, setShowUpload] = useState(false)
-  const [newReel, setNewReel] = useState({ caption: '', productName: '', productPrice: '', video: null, videoUrl: '' })
+  const [newReel, setNewReel] = useState({ caption: '', productId: '', video: null, videoUrl: '' })
   const [uploading, setUploading] = useState(false)
 
   // Persist reels to localStorage
@@ -34,17 +36,21 @@ const ReelsManager = () => {
     if (!newReel.video || !newReel.caption) return
     setUploading(true)
     try {
+      // Find the selected product
+      const selectedProduct = products.find(p => String(p.id) === String(newReel.productId))
+
       // Upload video to Hostinger
       const result = await uploadAPI.upload(newReel.video)
       setReels(prev => [...prev, {
         id: Date.now(),
         caption: newReel.caption,
-        productName: newReel.productName,
-        productPrice: newReel.productPrice,
+        productName: selectedProduct?.name || '',
+        productPrice: selectedProduct?.price || 0,
+        productId: selectedProduct?.id || null,
         videoUrl: result.url,
         createdAt: new Date().toISOString().split('T')[0],
       }])
-      setNewReel({ caption: '', productName: '', productPrice: '', video: null, videoUrl: '' })
+      setNewReel({ caption: '', productId: '', video: null, videoUrl: '' })
       setShowUpload(false)
     } catch (err) {
       alert('Failed to upload video: ' + err.message)
@@ -106,25 +112,20 @@ const ReelsManager = () => {
                 />
               </div>
 
-              <div className="reels-manager__form-row">
-                <div className="reels-manager__form-field">
-                  <label>Product Name</label>
-                  <input
-                    type="text"
-                    value={newReel.productName}
-                    onChange={(e) => setNewReel(prev => ({ ...prev, productName: e.target.value }))}
-                    placeholder="e.g. Leather Jacket"
-                  />
-                </div>
-                <div className="reels-manager__form-field">
-                  <label>Product Price (₹)</label>
-                  <input
-                    type="number"
-                    value={newReel.productPrice}
-                    onChange={(e) => setNewReel(prev => ({ ...prev, productPrice: e.target.value }))}
-                    placeholder="0"
-                  />
-                </div>
+              <div className="reels-manager__form-field">
+                <label>Link to Product *</label>
+                <select
+                  value={newReel.productId}
+                  onChange={(e) => setNewReel(prev => ({ ...prev, productId: e.target.value }))}
+                  className="reels-manager__product-select"
+                >
+                  <option value="">— Select a product —</option>
+                  {products.map(product => (
+                    <option key={product.id} value={product.id}>
+                      {product.name} — ₹{product.price?.toLocaleString('en-IN')}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
