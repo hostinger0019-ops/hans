@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
+import { ordersAPI } from '../services/api'
 import Navbar from '../components/Navbar'
 import {
   MapPin, CreditCard, CheckCircle, ChevronRight, Lock, Truck,
-  RotateCcw, ShieldCheck, Tag, X, AlertCircle, Package,
+  RotateCcw, ShieldCheck, Tag, X, AlertCircle, Package, Zap,
 } from 'lucide-react'
 import './CheckoutPage.css'
 
@@ -30,8 +31,7 @@ const CheckoutPage = () => {
   })
 
   const [payment, setPayment] = useState({
-    method: 'card',
-    cardNumber: '', cardName: '', expiry: '', cvv: '',
+    method: 'razorpay',
   })
 
   const [errors, setErrors] = useState({})
@@ -85,14 +85,8 @@ const CheckoutPage = () => {
   }
 
   const validatePayment = () => {
-    if (payment.method === 'cod') return true
-    const errs = {}
-    if (!payment.cardNumber.trim() || payment.cardNumber.replace(/\s/g, '').length < 16) errs.cardNumber = 'Valid card number is required'
-    if (!payment.cardName.trim()) errs.cardName = 'Name on card is required'
-    if (!payment.expiry.trim()) errs.expiry = 'Expiry date is required'
-    if (!payment.cvv.trim() || payment.cvv.length < 3) errs.cvv = 'Valid CVV is required'
-    setErrors(errs)
-    return Object.keys(errs).length === 0
+    // Razorpay handles its own validation, COD needs no validation
+    return true
   }
 
   const handleNext = () => {
@@ -100,12 +94,74 @@ const CheckoutPage = () => {
     else if (currentStep === 2 && validatePayment()) setCurrentStep(3)
   }
 
-  const handlePlaceOrder = () => {
-    setPlacing(true)
-    setTimeout(() => {
-      clearCart()
-      navigate('/order-confirmed')
-    }, 1500)
+  // ─── Razorpay Integration ───
+  const RAZORPAY_KEY = 'rzp_test_XXXXXXXXXX' // Replace with your Razorpay Key ID
+
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      if (document.getElementById('razorpay-script')) {
+        resolve(true)
+        return
+      }
+      const script = document.createElement('script')
+      script.id = 'razorpay-script'
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js'
+      script.onload = () => resolve(true)
+      script.onerror = () => resolve(false)
+      document.body.appendChild(script)
+    })
+  }
+
+  const handleRazorpayPayment = async () => {
+    const loaded = await loadRazorpayScript()
+    if (!loaded) {
+      alert('Failed to load Razorpay. Check your internet connection.')
+      return
+    }
+
+    const options = {
+      key: RAZORPAY_KEY,
+      amount: total * 100, // Razorpay expects amount in paise
+      currency: 'INR',
+      name: 'Tarik Clothing',
+      description: `Order - ${cartItems.length} item(s)`,
+      image: 'https://tarikclothing.com/favicon.ico',
+      handler: function (response) {
+        // Payment successful
+        setPlacing(true)
+        const orderData = {
+          customer_name: `${shipping.firstName} ${shipping.lastName}`,
+          email: shipping.email || '',
+          phone: shipping.phone,
+          address: shipping.address,
+          city: shipping.city,
+          state: shipping.state,
+          pincode: shipping.pincode,
+          items: cartItems.map(i => ({ id: i.id, name: i.name, qty: i.quantity, price: i.price, size: i.selectedSize, color: i.selectedColor })),
+          item_count: cartItems.reduce((sum, i) => sum + i.quantity, 0),
+          subtotal: cartSubtotal,
+          discount,
+          shipping_cost: shippingCost,
+          total,
+          payment_method: 'razorpay',
+          payment_id: response.razorpay_payment_id,
+        }
+        ordersAPI.create(orderData)
+          .then(() => { clearCart(); navigate('/order-confirmed') })
+          .catch(() => { clearCart(); navigate('/order-confirmed') })
+      },
+      prefill: {
+        name: `${shipping.firstName} ${shipping.lastName}`,
+        email: shipping.email || '',
+        contact: shipping.phone,
+      },
+      theme: {
+        color: '#c9a96e',
+      },
+    }
+
+    const rzp = new window.Razorpay(options)
+    rzp.open()
   }
 
   const updateShipping = (key, value) => {
@@ -118,10 +174,7 @@ const CheckoutPage = () => {
     if (errors[key]) setErrors(prev => ({ ...prev, [key]: null }))
   }
 
-  const formatCardNumber = (val) => {
-    const clean = val.replace(/\D/g, '').slice(0, 16)
-    return clean.replace(/(.{4})/g, '$1 ').trim()
-  }
+
 
   return (
     <>
@@ -222,20 +275,12 @@ const CheckoutPage = () => {
                   <h2 className="checkout__card-title"><CreditCard size={20} /> Payment Method</h2>
 
                   <div className="checkout__payment-methods">
-                    <label className={`checkout__pay-option ${payment.method === 'card' ? 'checkout__pay-option--active' : ''}`}>
-                      <input type="radio" name="payment" value="card" checked={payment.method === 'card'} onChange={() => updatePayment('method', 'card')} />
-                      <CreditCard size={18} />
+                    <label className={`checkout__pay-option ${payment.method === 'razorpay' ? 'checkout__pay-option--active' : ''}`}>
+                      <input type="radio" name="payment" value="razorpay" checked={payment.method === 'razorpay'} onChange={() => updatePayment('method', 'razorpay')} />
+                      <Zap size={18} />
                       <div>
-                        <span>Credit / Debit Card</span>
-                        <small>Visa, Mastercard, RuPay</small>
-                      </div>
-                    </label>
-                    <label className={`checkout__pay-option ${payment.method === 'upi' ? 'checkout__pay-option--active' : ''}`}>
-                      <input type="radio" name="payment" value="upi" checked={payment.method === 'upi'} onChange={() => updatePayment('method', 'upi')} />
-                      <span className="checkout__upi-icon">UPI</span>
-                      <div>
-                        <span>UPI Payment</span>
-                        <small>Google Pay, PhonePe, Paytm</small>
+                        <span>Pay Online</span>
+                        <small>Cards, UPI, Wallets, Net Banking</small>
                       </div>
                     </label>
                     <label className={`checkout__pay-option ${payment.method === 'cod' ? 'checkout__pay-option--active' : ''}`}>
@@ -248,39 +293,10 @@ const CheckoutPage = () => {
                     </label>
                   </div>
 
-                  {payment.method === 'card' && (
-                    <div className="checkout__card-form">
-                      <div className="checkout__field">
-                        <label>Card Number</label>
-                        <input type="text" value={payment.cardNumber} onChange={e => updatePayment('cardNumber', formatCardNumber(e.target.value))} placeholder="1234 5678 9012 3456" maxLength={19} className={errors.cardNumber ? 'checkout__input--error' : ''} />
-                        {errors.cardNumber && <span className="checkout__error">{errors.cardNumber}</span>}
-                      </div>
-                      <div className="checkout__field">
-                        <label>Name on Card</label>
-                        <input type="text" value={payment.cardName} onChange={e => updatePayment('cardName', e.target.value)} placeholder="RAHUL SHARMA" className={errors.cardName ? 'checkout__input--error' : ''} />
-                        {errors.cardName && <span className="checkout__error">{errors.cardName}</span>}
-                      </div>
-                      <div className="checkout__row">
-                        <div className="checkout__field">
-                          <label>Expiry Date</label>
-                          <input type="text" value={payment.expiry} onChange={e => updatePayment('expiry', e.target.value)} placeholder="MM/YY" maxLength={5} className={errors.expiry ? 'checkout__input--error' : ''} />
-                          {errors.expiry && <span className="checkout__error">{errors.expiry}</span>}
-                        </div>
-                        <div className="checkout__field">
-                          <label>CVV</label>
-                          <input type="password" value={payment.cvv} onChange={e => updatePayment('cvv', e.target.value.replace(/\D/g, '').slice(0, 4))} placeholder="•••" maxLength={4} className={errors.cvv ? 'checkout__input--error' : ''} />
-                          {errors.cvv && <span className="checkout__error">{errors.cvv}</span>}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {payment.method === 'upi' && (
-                    <div className="checkout__upi-form">
-                      <div className="checkout__field">
-                        <label>UPI ID</label>
-                        <input type="text" placeholder="name@upi" />
-                      </div>
+                  {payment.method === 'razorpay' && (
+                    <div className="checkout__razorpay-note">
+                      <ShieldCheck size={16} />
+                      <p>You'll be redirected to Razorpay's secure payment page after reviewing your order. All major cards, UPI, wallets & net banking accepted.</p>
                     </div>
                   )}
 
@@ -326,8 +342,7 @@ const CheckoutPage = () => {
                       <button className="checkout__review-edit" onClick={() => setCurrentStep(2)}>Edit</button>
                     </div>
                     <div className="checkout__review-content">
-                      {payment.method === 'card' && <p>💳 Card ending in {payment.cardNumber.slice(-4)}</p>}
-                      {payment.method === 'upi' && <p>📱 UPI Payment</p>}
+                      {payment.method === 'razorpay' && <p>⚡ Pay Online (Razorpay)</p>}
                       {payment.method === 'cod' && <p>📦 Cash on Delivery</p>}
                     </div>
                   </div>
@@ -353,13 +368,41 @@ const CheckoutPage = () => {
 
                   <button
                     className={`btn btn-primary btn-lg checkout__place-order ${placing ? 'checkout__place-order--placing' : ''}`}
-                    onClick={handlePlaceOrder}
+                    onClick={() => {
+                      if (payment.method === 'razorpay') {
+                        handleRazorpayPayment()
+                      } else {
+                        // COD order
+                        setPlacing(true)
+                        const orderData = {
+                          customer_name: `${shipping.firstName} ${shipping.lastName}`,
+                          email: shipping.email || '',
+                          phone: shipping.phone,
+                          address: shipping.address,
+                          city: shipping.city,
+                          state: shipping.state,
+                          pincode: shipping.pincode,
+                          items: cartItems.map(i => ({ id: i.id, name: i.name, qty: i.quantity, price: i.price, size: i.selectedSize, color: i.selectedColor })),
+                          item_count: cartItems.reduce((sum, i) => sum + i.quantity, 0),
+                          subtotal: cartSubtotal,
+                          discount,
+                          shipping_cost: shippingCost,
+                          total: total + 49,
+                          payment_method: 'cod',
+                        }
+                        ordersAPI.create(orderData)
+                          .then(() => { clearCart(); navigate('/order-confirmed') })
+                          .catch(() => { clearCart(); navigate('/order-confirmed') })
+                      }
+                    }}
                     disabled={placing}
                   >
                     {placing ? (
                       <span className="checkout__spinner"></span>
+                    ) : payment.method === 'razorpay' ? (
+                      <><Zap size={16} /> Pay ₹{total.toLocaleString()} with Razorpay</>
                     ) : (
-                      <><Lock size={16} /> Place Order — ₹{total.toLocaleString()}</>
+                      <><Lock size={16} /> Place COD Order — ₹{(total + 49).toLocaleString()}</>
                     )}
                   </button>
                 </div>

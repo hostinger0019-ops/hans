@@ -171,3 +171,13 @@
   .checkout__step-label { display: none; }
   .checkout__card { padding: var(--space-lg); }
 }
+
+/* Razorpay Note */
+.checkout__razorpay-note { display: flex; align-items: flex-start; gap: var(--space-sm); padding: var(--space-md); background: rgba(201, 169, 110, 0.08); border: 1px solid rgba(201, 169, 110, 0.2); border-radius: var(--radius-md); margin-top: var(--space-lg); }
+.checkout__razorpay-note svg { color: var(--color-gold); flex-shrink: 0; margin-top: 2px; }
+.checkout__razorpay-note p { font-size: var(--fs-sm); color: var(--color-text-secondary); line-height: var(--lh-normal); margin: 0; }
+
+/* COD Note */
+.checkout__cod-note { display: flex; align-items: flex-start; gap: var(--space-sm); padding: var(--space-md); background: rgba(231, 76, 60, 0.08); border: 1px solid rgba(231, 76, 60, 0.2); border-radius: var(--radius-md); margin-top: var(--space-lg); }
+.checkout__cod-note svg { color: #e74c3c; flex-shrink: 0; margin-top: 2px; }
+.checkout__cod-note p { font-size: var(--fs-sm); color: var(--color-text-secondary); line-height: var(--lh-normal); margin: 0; }
