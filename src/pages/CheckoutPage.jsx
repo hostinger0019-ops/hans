@@ -119,49 +119,86 @@ const CheckoutPage = () => {
       return
     }
 
-    const options = {
-      key: RAZORPAY_KEY,
-      amount: total * 100, // Razorpay expects amount in paise
-      currency: 'INR',
-      name: 'Tarik Clothing',
-      description: `Order - ${cartItems.length} item(s)`,
-      image: 'https://tarikclothing.com/favicon.ico',
-      handler: function (response) {
-        // Payment successful
-        setPlacing(true)
-        const orderData = {
-          customer_name: `${shipping.firstName} ${shipping.lastName}`,
-          email: shipping.email || '',
-          phone: shipping.phone,
-          address: shipping.address,
-          city: shipping.city,
-          state: shipping.state,
-          pincode: shipping.pincode,
-          items: cartItems.map(i => ({ id: i.id, name: i.name, qty: i.quantity, price: i.price, size: i.selectedSize, color: i.selectedColor })),
-          item_count: cartItems.reduce((sum, i) => sum + i.quantity, 0),
-          subtotal: cartSubtotal,
-          discount,
-          shipping_cost: shippingCost,
-          total,
-          payment_method: 'razorpay',
-          payment_id: response.razorpay_payment_id,
-        }
-        ordersAPI.create(orderData)
-          .then(() => { clearCart(); navigate('/order-confirmed') })
-          .catch(() => { clearCart(); navigate('/order-confirmed') })
-      },
-      prefill: {
-        name: `${shipping.firstName} ${shipping.lastName}`,
-        email: shipping.email || '',
-        contact: shipping.phone,
-      },
-      theme: {
-        color: '#c9a96e',
-      },
-    }
+    setPlacing(true)
 
-    const rzp = new window.Razorpay(options)
-    rzp.open()
+    // Step 1: Create order on backend
+    try {
+      const IS_PRODUCTION = window.location.protocol === 'https:'
+      const createOrderUrl = IS_PRODUCTION
+        ? `/api-proxy.php?path=${encodeURIComponent('/api/payment/create-order')}`
+        : `http://35.244.35.135:6000/api/payment/create-order`
+
+      const res = await fetch(createOrderUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: total }),
+      })
+
+      if (!res.ok) throw new Error('Failed to create order')
+      const orderData = await res.json()
+
+      setPlacing(false)
+
+      // Step 2: Open Razorpay checkout with order_id
+      const options = {
+        key: RAZORPAY_KEY,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: 'Tarik Clothing',
+        description: `Order - ${cartItems.length} item(s)`,
+        image: 'https://tarikclothing.com/favicon.ico',
+        order_id: orderData.order_id,
+        handler: function (response) {
+          // Payment successful
+          setPlacing(true)
+          const order = {
+            customer_name: `${shipping.firstName} ${shipping.lastName}`,
+            email: shipping.email || '',
+            phone: shipping.phone,
+            address: shipping.address,
+            city: shipping.city,
+            state: shipping.state,
+            pincode: shipping.pincode,
+            items: cartItems.map(i => ({ id: i.id, name: i.name, qty: i.quantity, price: i.price, size: i.selectedSize, color: i.selectedColor })),
+            item_count: cartItems.reduce((sum, i) => sum + i.quantity, 0),
+            subtotal: cartSubtotal,
+            discount,
+            shipping_cost: shippingCost,
+            total,
+            payment_method: 'razorpay',
+            payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+          }
+          ordersAPI.create(order)
+            .then(() => { clearCart(); navigate('/order-confirmed') })
+            .catch(() => { clearCart(); navigate('/order-confirmed') })
+        },
+        prefill: {
+          name: `${shipping.firstName} ${shipping.lastName}`,
+          email: shipping.email || '',
+          contact: shipping.phone,
+        },
+        theme: {
+          color: '#c9a96e',
+        },
+        modal: {
+          ondismiss: function () {
+            setPlacing(false)
+          },
+        },
+      }
+
+      const rzp = new window.Razorpay(options)
+      rzp.on('payment.failed', function (response) {
+        alert('Oops! Something went wrong.\nPayment Failed')
+        setPlacing(false)
+      })
+      rzp.open()
+    } catch (err) {
+      setPlacing(false)
+      alert('Could not initiate payment. Please try again.')
+      console.error(err)
+    }
   }
 
   const updateShipping = (key, value) => {

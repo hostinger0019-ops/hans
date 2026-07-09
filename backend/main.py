@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from database import create_tables
-from routes import auth, products, orders, upload, reels
+from routes import auth, products, orders, upload, reels, payment
 
 # ─── Create App ───
 app = FastAPI(
@@ -33,6 +33,7 @@ app.include_router(products.router)
 app.include_router(orders.router)
 app.include_router(upload.router)
 app.include_router(reels.router)
+app.include_router(payment.router)
 
 # ─── Startup ───
 @app.on_event("startup")
