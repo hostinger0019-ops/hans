@@ -485,21 +485,7 @@ const LandingPage = () => {
               </div>
             </div>
 
-            <div className="collection-card collection-card--wide" id="collection-accessories">
-              <img
-                src="https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=1200&q=80"
-                alt="Accessories Collection"
-                className="collection-card__image"
-              />
-              <div className="collection-card__overlay">
-                <span className="collection-card__tag">Must Have</span>
-                <h3 className="collection-card__title">Accessories</h3>
-                <p className="collection-card__desc">Complete your look with premium accessories</p>
-                <Link to="/collections" className="collection-card__link">
-                  Explore Now <ArrowUpRight size={16} />
-                </Link>
-              </div>
-            </div>
+
           </div>
         </div>
       </section>
