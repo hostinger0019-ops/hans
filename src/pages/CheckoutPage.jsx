@@ -95,7 +95,7 @@ const CheckoutPage = () => {
   }
 
   // ─── Razorpay Integration ───
-  const RAZORPAY_KEY = 'rzp_test_XXXXXXXXXX' // Replace with your Razorpay Key ID
+  const RAZORPAY_KEY = 'rzp_live_TBI7uKecttibrI' // Live Razorpay Key
 
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
