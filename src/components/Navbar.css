@@ -192,12 +192,13 @@
 
 /* Mobile Toggle */
 .navbar__mobile-toggle {
-  display: none;
+  display: flex;
   width: 40px;
   height: 40px;
   align-items: center;
   justify-content: center;
   color: var(--color-white);
+  cursor: pointer;
 }
 
 /* Search Overlay */
@@ -345,6 +346,12 @@
 
 .mobile-menu__link--highlight {
   color: var(--color-danger);
+}
+
+.mobile-menu__divider {
+  height: 1px;
+  background: var(--color-border);
+  margin: var(--space-xs) var(--space-xl);
 }
 
 .mobile-menu__footer {

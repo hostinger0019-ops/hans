@@ -127,9 +127,15 @@ const Navbar = () => {
             <li><Link to="/collections/men" className="mobile-menu__link" onClick={() => setIsMobileMenuOpen(false)}>Men</Link></li>
             <li><Link to="/collections/women" className="mobile-menu__link" onClick={() => setIsMobileMenuOpen(false)}>Women</Link></li>
           </ul>
+          <div className="mobile-menu__divider"></div>
+          <ul className="mobile-menu__links">
+            <li><Link to="/contact" className="mobile-menu__link" onClick={() => setIsMobileMenuOpen(false)}>Contact Us</Link></li>
+            <li><Link to="/terms" className="mobile-menu__link" onClick={() => setIsMobileMenuOpen(false)}>Terms & Conditions</Link></li>
+            <li><Link to="/privacy" className="mobile-menu__link" onClick={() => setIsMobileMenuOpen(false)}>Privacy Policy</Link></li>
+          </ul>
           <div className="mobile-menu__footer">
-            <a href="#" className="mobile-menu__footer-link"><User size={18} /> My Account</a>
-            <a href="#" className="mobile-menu__footer-link"><Heart size={18} /> Wishlist</a>
+            <Link to="/contact" className="mobile-menu__footer-link" onClick={() => setIsMobileMenuOpen(false)}><User size={18} /> Contact Us</Link>
+            <Link to="/" className="mobile-menu__footer-link" onClick={() => setIsMobileMenuOpen(false)}><Heart size={18} /> Wishlist</Link>
           </div>
         </div>
       </div>
