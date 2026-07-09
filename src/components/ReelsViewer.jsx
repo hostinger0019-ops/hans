@@ -20,7 +20,7 @@ import './ReelsViewer.css'
 const ReelsViewer = ({ reels, startIndex = 0, onClose }) => {
   const navigate = useNavigate()
   const [currentIndex, setCurrentIndex] = useState(startIndex)
-  const [isMuted, setIsMuted] = useState(true)
+  const [isMuted, setIsMuted] = useState(false)
   const [isPlaying, setIsPlaying] = useState(true)
   const [likedReels, setLikedReels] = useState(new Set())
   const [savedReels, setSavedReels] = useState(new Set())
