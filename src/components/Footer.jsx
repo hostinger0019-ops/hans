@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { MapPin, Phone, Mail, ArrowUpRight } from 'lucide-react'
 import './Footer.css'
 
@@ -69,11 +70,11 @@ const Footer = () => {
           <div className="footer__column">
             <h4 className="footer__column-title">Customer Service</h4>
             <ul className="footer__links">
-              <li><a href="#">Track Order</a></li>
+              <li><Link to="/contact">Contact Us</Link></li>
+              <li><Link to="/terms">Terms & Conditions</Link></li>
+              <li><Link to="/privacy">Privacy Policy</Link></li>
               <li><a href="#">Shipping Policy</a></li>
               <li><a href="#">Returns & Exchanges</a></li>
-              <li><a href="#">Size Guide</a></li>
-              <li><a href="#">FAQs</a></li>
             </ul>
           </div>
 
@@ -83,15 +84,15 @@ const Footer = () => {
             <ul className="footer__contact-list">
               <li>
                 <MapPin size={16} />
-                <span>123 Fashion Street, Mumbai, MH 400001</span>
+                <span>Tarik Fashion Company, India</span>
               </li>
               <li>
                 <Phone size={16} />
-                <span>+91 98765 43210</span>
+                <span>+91 8448032994</span>
               </li>
               <li>
                 <Mail size={16} />
-                <span>hello@tarikclothing.com</span>
+                <span>tarikfashioncompany@gmail.com</span>
               </li>
             </ul>
           </div>
@@ -100,12 +101,12 @@ const Footer = () => {
         {/* Footer Bottom */}
         <div className="footer__bottom">
           <p className="footer__copyright">
-            © {new Date().getFullYear()} Tarik Clothing. All rights reserved.
+            © {new Date().getFullYear()} Tarik Fashion Company. All rights reserved.
           </p>
           <div className="footer__bottom-links">
-            <a href="#">Privacy Policy</a>
-            <a href="#">Terms of Service</a>
-            <a href="#">Cookie Policy</a>
+            <Link to="/privacy">Privacy Policy</Link>
+            <Link to="/terms">Terms & Conditions</Link>
+            <Link to="/contact">Contact Us</Link>
           </div>
           <div className="footer__payment">
             <span className="footer__payment-label">We Accept</span>

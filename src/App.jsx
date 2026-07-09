@@ -10,6 +10,9 @@ import ProductDetail from './pages/ProductDetail'
 import CategoryPage from './pages/CategoryPage'
 import CheckoutPage from './pages/CheckoutPage'
 import OrderConfirmation from './pages/OrderConfirmation'
+import TermsPage from './pages/TermsPage'
+import PrivacyPage from './pages/PrivacyPage'
+import ContactPage from './pages/ContactPage'
 import Footer from './components/Footer'
 import CartDrawer from './components/CartDrawer'
 
@@ -50,6 +53,9 @@ function AppContent() {
       <Route path="/product/:id" element={<ProductDetail />} />
       <Route path="/checkout" element={<CheckoutPage />} />
       <Route path="/order-confirmed" element={<OrderConfirmation />} />
+      <Route path="/terms" element={<TermsPage />} />
+      <Route path="/privacy" element={<PrivacyPage />} />
+      <Route path="/contact" element={<ContactPage />} />
 
       {/* Admin */}
       <Route

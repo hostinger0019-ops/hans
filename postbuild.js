@@ -24,6 +24,9 @@ const routes = [
   'collections/unisex',
   'checkout',
   'order-confirmed',
+  'terms',
+  'privacy',
+  'contact',
 ];
 
 // Create a folder + index.html for each route
