@@ -74,7 +74,7 @@ const CheckoutPage = () => {
     const errs = {}
     if (!shipping.firstName.trim()) errs.firstName = 'First name is required'
     if (!shipping.lastName.trim()) errs.lastName = 'Last name is required'
-    if (!shipping.email.trim() || !/\S+@\S+\.\S+/.test(shipping.email)) errs.email = 'Valid email is required'
+    if (shipping.email.trim() && !/\S+@\S+\.\S+/.test(shipping.email)) errs.email = 'Please enter a valid email'
     if (!shipping.phone.trim() || shipping.phone.length < 10) errs.phone = 'Valid phone number is required'
     if (!shipping.address.trim()) errs.address = 'Address is required'
     if (!shipping.city.trim()) errs.city = 'City is required'
@@ -153,20 +153,20 @@ const CheckoutPage = () => {
                   <div className="checkout__row">
                     <div className="checkout__field">
                       <label>First Name *</label>
-                      <input type="text" value={shipping.firstName} onChange={e => updateShipping('firstName', e.target.value)} placeholder="John" className={errors.firstName ? 'checkout__input--error' : ''} />
+                      <input type="text" value={shipping.firstName} onChange={e => updateShipping('firstName', e.target.value)} placeholder="Rahul" className={errors.firstName ? 'checkout__input--error' : ''} />
                       {errors.firstName && <span className="checkout__error">{errors.firstName}</span>}
                     </div>
                     <div className="checkout__field">
                       <label>Last Name *</label>
-                      <input type="text" value={shipping.lastName} onChange={e => updateShipping('lastName', e.target.value)} placeholder="Doe" className={errors.lastName ? 'checkout__input--error' : ''} />
+                      <input type="text" value={shipping.lastName} onChange={e => updateShipping('lastName', e.target.value)} placeholder="Sharma" className={errors.lastName ? 'checkout__input--error' : ''} />
                       {errors.lastName && <span className="checkout__error">{errors.lastName}</span>}
                     </div>
                   </div>
 
                   <div className="checkout__row">
                     <div className="checkout__field">
-                      <label>Email *</label>
-                      <input type="email" value={shipping.email} onChange={e => updateShipping('email', e.target.value)} placeholder="john@example.com" className={errors.email ? 'checkout__input--error' : ''} />
+                      <label>Email (Optional)</label>
+                      <input type="email" value={shipping.email} onChange={e => updateShipping('email', e.target.value)} placeholder="rahul@example.com" className={errors.email ? 'checkout__input--error' : ''} />
                       {errors.email && <span className="checkout__error">{errors.email}</span>}
                     </div>
                     <div className="checkout__field">
@@ -257,7 +257,7 @@ const CheckoutPage = () => {
                       </div>
                       <div className="checkout__field">
                         <label>Name on Card</label>
-                        <input type="text" value={payment.cardName} onChange={e => updatePayment('cardName', e.target.value)} placeholder="JOHN DOE" className={errors.cardName ? 'checkout__input--error' : ''} />
+                        <input type="text" value={payment.cardName} onChange={e => updatePayment('cardName', e.target.value)} placeholder="RAHUL SHARMA" className={errors.cardName ? 'checkout__input--error' : ''} />
                         {errors.cardName && <span className="checkout__error">{errors.cardName}</span>}
                       </div>
                       <div className="checkout__row">
