@@ -12,7 +12,6 @@ import './CheckoutPage.css'
 const STEPS = [
   { id: 1, label: 'Shipping', icon: MapPin },
   { id: 2, label: 'Payment', icon: CreditCard },
-  { id: 3, label: 'Review', icon: CheckCircle },
 ]
 
 const CheckoutPage = () => {
@@ -91,7 +90,6 @@ const CheckoutPage = () => {
 
   const handleNext = () => {
     if (currentStep === 1 && validateShipping()) setCurrentStep(2)
-    else if (currentStep === 2 && validatePayment()) setCurrentStep(3)
   }
 
   // ─── Razorpay Integration ───
@@ -346,104 +344,50 @@ const CheckoutPage = () => {
 
                   <div className="checkout__nav-btns">
                     <button className="btn btn-outline" onClick={() => setCurrentStep(1)}>Back</button>
-                    <button className="btn btn-primary btn-lg" onClick={handleNext}>
-                      Review Order <ChevronRight size={18} />
+                    <button
+                      className={`btn btn-primary btn-lg checkout__place-order ${placing ? 'checkout__place-order--placing' : ''}`}
+                      onClick={() => {
+                        if (payment.method === 'razorpay') {
+                          handleRazorpayPayment()
+                        } else {
+                          // COD order
+                          setPlacing(true)
+                          const orderData = {
+                            customer_name: `${shipping.firstName} ${shipping.lastName}`,
+                            email: shipping.email || '',
+                            phone: shipping.phone,
+                            address: shipping.address,
+                            city: shipping.city,
+                            state: shipping.state,
+                            pincode: shipping.pincode,
+                            items: cartItems.map(i => ({ id: i.id, name: i.name, qty: i.quantity, price: i.price, size: i.selectedSize, color: i.selectedColor })),
+                            item_count: cartItems.reduce((sum, i) => sum + i.quantity, 0),
+                            subtotal: cartSubtotal,
+                            discount,
+                            shipping_cost: shippingCost,
+                            total: total + 49,
+                            payment_method: 'cod',
+                          }
+                          ordersAPI.create(orderData)
+                            .then(() => { clearCart(); navigate('/order-confirmed') })
+                            .catch(() => { clearCart(); navigate('/order-confirmed') })
+                        }
+                      }}
+                      disabled={placing}
+                    >
+                      {placing ? (
+                        <span className="checkout__spinner"></span>
+                      ) : payment.method === 'razorpay' ? (
+                        <><Zap size={16} /> Pay ₹{total.toLocaleString()} with Razorpay</>
+                      ) : (
+                        <><Lock size={16} /> Place COD Order — ₹{(total + 49).toLocaleString()}</>
+                      )}
                     </button>
                   </div>
                 </div>
               )}
 
-              {/* STEP 3: REVIEW */}
-              {currentStep === 3 && (
-                <div className="checkout__card checkout__card--animate">
-                  <h2 className="checkout__card-title"><CheckCircle size={20} /> Review Your Order</h2>
 
-                  {/* Shipping Summary */}
-                  <div className="checkout__review-section">
-                    <div className="checkout__review-header">
-                      <h3>Shipping Address</h3>
-                      <button className="checkout__review-edit" onClick={() => setCurrentStep(1)}>Edit</button>
-                    </div>
-                    <div className="checkout__review-content">
-                      <p><strong>{shipping.firstName} {shipping.lastName}</strong></p>
-                      <p>{shipping.address}{shipping.apartment ? `, ${shipping.apartment}` : ''}</p>
-                      <p>{shipping.city}, {shipping.state} - {shipping.pincode}</p>
-                      <p>{shipping.phone} • {shipping.email}</p>
-                    </div>
-                  </div>
-
-                  {/* Payment Summary */}
-                  <div className="checkout__review-section">
-                    <div className="checkout__review-header">
-                      <h3>Payment Method</h3>
-                      <button className="checkout__review-edit" onClick={() => setCurrentStep(2)}>Edit</button>
-                    </div>
-                    <div className="checkout__review-content">
-                      {payment.method === 'razorpay' && <p>⚡ Pay Online (Razorpay)</p>}
-                      {payment.method === 'cod' && <p>📦 Cash on Delivery</p>}
-                    </div>
-                  </div>
-
-                  {/* Items */}
-                  <div className="checkout__review-section">
-                    <h3>Items ({cartItems.length})</h3>
-                    <div className="checkout__review-items">
-                      {cartItems.map(item => (
-                        <div className="checkout__review-item" key={`${item.id}-${item.size}-${item.color}`}>
-                          <img src={item.image} alt={item.name} />
-                          <div className="checkout__review-item-info">
-                            <span className="checkout__review-item-name">{item.name}</span>
-                            <span className="checkout__review-item-meta">
-                              {item.size && `Size: ${item.size}`} {item.color && `• Color: ${item.color}`} • Qty: {item.quantity}
-                            </span>
-                          </div>
-                          <span className="checkout__review-item-price">₹{(item.price * item.quantity).toLocaleString()}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <button
-                    className={`btn btn-primary btn-lg checkout__place-order ${placing ? 'checkout__place-order--placing' : ''}`}
-                    onClick={() => {
-                      if (payment.method === 'razorpay') {
-                        handleRazorpayPayment()
-                      } else {
-                        // COD order
-                        setPlacing(true)
-                        const orderData = {
-                          customer_name: `${shipping.firstName} ${shipping.lastName}`,
-                          email: shipping.email || '',
-                          phone: shipping.phone,
-                          address: shipping.address,
-                          city: shipping.city,
-                          state: shipping.state,
-                          pincode: shipping.pincode,
-                          items: cartItems.map(i => ({ id: i.id, name: i.name, qty: i.quantity, price: i.price, size: i.selectedSize, color: i.selectedColor })),
-                          item_count: cartItems.reduce((sum, i) => sum + i.quantity, 0),
-                          subtotal: cartSubtotal,
-                          discount,
-                          shipping_cost: shippingCost,
-                          total: total + 49,
-                          payment_method: 'cod',
-                        }
-                        ordersAPI.create(orderData)
-                          .then(() => { clearCart(); navigate('/order-confirmed') })
-                          .catch(() => { clearCart(); navigate('/order-confirmed') })
-                      }
-                    }}
-                    disabled={placing}
-                  >
-                    {placing ? (
-                      <span className="checkout__spinner"></span>
-                    ) : payment.method === 'razorpay' ? (
-                      <><Zap size={16} /> Pay ₹{total.toLocaleString()} with Razorpay</>
-                    ) : (
-                      <><Lock size={16} /> Place COD Order — ₹{(total + 49).toLocaleString()}</>
-                    )}
-                  </button>
-                </div>
-              )}
             </div>
 
             {/* ════════ RIGHT: ORDER SUMMARY ════════ */}
