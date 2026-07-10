@@ -57,4 +57,14 @@ try {
   console.warn('⚠️ upload.php not found, skipping');
 }
 
+// Create persistent uploads directories with .gitkeep
+// These directories MUST exist for uploaded images/reels to persist across deploys
+const uploadDirs = ['uploads/images', 'uploads/reels'];
+for (const dir of uploadDirs) {
+  const fullDir = join(distDir, dir);
+  mkdirSync(fullDir, { recursive: true });
+  writeFileSync(join(fullDir, '.gitkeep'), '');
+}
+console.log('✅ Created uploads directories with .gitkeep');
+
 console.log(`✅ Created ${routes.length} route folders + 404.html in dist/`);

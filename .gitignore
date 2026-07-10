@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Uploaded media files (persist across deploys — never delete)
+dist/uploads/images/*
+!dist/uploads/images/.gitkeep
+dist/uploads/reels/*
+!dist/uploads/reels/.gitkeep
