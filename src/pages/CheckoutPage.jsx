@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { ordersAPI } from '../services/api'
@@ -6,13 +6,24 @@ import Navbar from '../components/Navbar'
 import {
   MapPin, CreditCard, CheckCircle, ChevronRight, Lock, Truck,
   RotateCcw, ShieldCheck, Tag, X, AlertCircle, Package, Zap,
+  Smartphone, ArrowRight, RefreshCw,
 } from 'lucide-react'
 import './CheckoutPage.css'
 
 const STEPS = [
-  { id: 1, label: 'Shipping', icon: MapPin },
-  { id: 2, label: 'Payment', icon: CreditCard },
+  { id: 1, label: 'Verify', icon: Smartphone },
+  { id: 2, label: 'Shipping', icon: MapPin },
+  { id: 3, label: 'Payment', icon: CreditCard },
 ]
+
+/* ─── API helper for Shiprocket OTP ─── */
+function buildUrl(endpoint) {
+  const IS_PRODUCTION = window.location.protocol === 'https:'
+  if (IS_PRODUCTION) {
+    return `/api-proxy.php?path=${encodeURIComponent(endpoint)}`
+  }
+  return `http://35.244.35.135:6000${endpoint}`
+}
 
 const CheckoutPage = () => {
   const navigate = useNavigate()
@@ -22,6 +33,19 @@ const CheckoutPage = () => {
   const [promoApplied, setPromoApplied] = useState(false)
   const [promoError, setPromoError] = useState('')
   const [placing, setPlacing] = useState(false)
+
+  // OTP state
+  const [otpPhone, setOtpPhone] = useState('')
+  const [otpToken, setOtpToken] = useState('')
+  const [otpValue, setOtpValue] = useState('')
+  const [otpSending, setOtpSending] = useState(false)
+  const [otpSent, setOtpSent] = useState(false)
+  const [otpVerifying, setOtpVerifying] = useState(false)
+  const [otpVerified, setOtpVerified] = useState(false)
+  const [otpError, setOtpError] = useState('')
+  const [savedAddresses, setSavedAddresses] = useState([])
+  const [countdown, setCountdown] = useState(0)
+  const otpInputRef = useRef(null)
 
   const [shipping, setShipping] = useState({
     firstName: '', lastName: '', email: '', phone: '',
@@ -36,6 +60,13 @@ const CheckoutPage = () => {
   const [errors, setErrors] = useState({})
 
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'smooth' }) }, [currentStep])
+
+  // Countdown timer for OTP resend
+  useEffect(() => {
+    if (countdown <= 0) return
+    const timer = setTimeout(() => setCountdown(c => c - 1), 1000)
+    return () => clearTimeout(timer)
+  }, [countdown])
 
   // Redirect if cart empty
   if (cartItems.length === 0 && !placing) {
@@ -71,6 +102,102 @@ const CheckoutPage = () => {
     }
   }
 
+  /* ─── OTP Functions ─── */
+  const handleSendOTP = async () => {
+    const phone = otpPhone.replace(/\D/g, '').replace(/^91/, '')
+    if (phone.length !== 10) {
+      setOtpError('Please enter a valid 10-digit phone number')
+      return
+    }
+    setOtpError('')
+    setOtpSending(true)
+    try {
+      const res = await fetch(buildUrl('/api/shiprocket/send-otp'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone }),
+      })
+      const data = await res.json()
+      if (data.success && data.token) {
+        setOtpToken(data.token)
+        setOtpSent(true)
+        setCountdown(30)
+        setTimeout(() => otpInputRef.current?.focus(), 100)
+      } else {
+        setOtpError(data.message || 'Failed to send OTP. Try again.')
+      }
+    } catch (err) {
+      setOtpError('Network error. Please try again.')
+    }
+    setOtpSending(false)
+  }
+
+  const handleVerifyOTP = async () => {
+    if (otpValue.length < 4) {
+      setOtpError('Please enter the complete OTP')
+      return
+    }
+    setOtpError('')
+    setOtpVerifying(true)
+    try {
+      const res = await fetch(buildUrl('/api/shiprocket/verify-otp'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: otpToken, otp: otpValue }),
+      })
+      const data = await res.json()
+      if (data.success && data.verified) {
+        setOtpVerified(true)
+        const cleanPhone = otpPhone.replace(/\D/g, '').replace(/^91/, '')
+        setShipping(prev => ({ ...prev, phone: cleanPhone }))
+
+        // Auto-fill from saved addresses if available
+        if (data.addresses && data.addresses.length > 0) {
+          setSavedAddresses(data.addresses)
+          const addr = data.addresses[0]
+          setShipping(prev => ({
+            ...prev,
+            phone: cleanPhone,
+            firstName: addr.first_name || addr.name?.split(' ')[0] || prev.firstName,
+            lastName: addr.last_name || addr.name?.split(' ').slice(1).join(' ') || prev.lastName,
+            address: addr.address || addr.address_1 || prev.address,
+            apartment: addr.address_2 || prev.apartment,
+            city: addr.city || prev.city,
+            state: addr.state || prev.state,
+            pincode: addr.pincode || addr.zip || prev.pincode,
+            email: addr.email || prev.email,
+          }))
+        }
+
+        // Auto-advance to shipping step
+        setTimeout(() => setCurrentStep(2), 600)
+      } else {
+        setOtpError(data.message || 'Invalid OTP. Please try again.')
+      }
+    } catch (err) {
+      setOtpError('Network error. Please try again.')
+    }
+    setOtpVerifying(false)
+  }
+
+  const handleSelectAddress = (addr) => {
+    setShipping(prev => ({
+      ...prev,
+      firstName: addr.first_name || addr.name?.split(' ')[0] || prev.firstName,
+      lastName: addr.last_name || addr.name?.split(' ').slice(1).join(' ') || prev.lastName,
+      address: addr.address || addr.address_1 || prev.address,
+      apartment: addr.address_2 || prev.apartment,
+      city: addr.city || prev.city,
+      state: addr.state || prev.state,
+      pincode: addr.pincode || addr.zip || prev.pincode,
+      email: addr.email || prev.email,
+    }))
+  }
+
+  const handleSkipOTP = () => {
+    setCurrentStep(2)
+  }
+
   /* ─── Validation ─── */
   const validateShipping = () => {
     const errs = {}
@@ -92,7 +219,7 @@ const CheckoutPage = () => {
   }
 
   const handleNext = () => {
-    if (currentStep === 1 && validateShipping()) setCurrentStep(2)
+    if (currentStep === 2 && validateShipping()) setCurrentStep(3)
   }
 
   // ─── Razorpay Integration ───
@@ -237,10 +364,114 @@ const CheckoutPage = () => {
             {/* ════════ LEFT: FORM ════════ */}
             <div className="checkout__form-area">
 
-              {/* STEP 1: SHIPPING */}
+              {/* STEP 1: PHONE OTP VERIFICATION */}
               {currentStep === 1 && (
                 <div className="checkout__card checkout__card--animate">
+                  <h2 className="checkout__card-title"><Smartphone size={20} /> Verify Your Phone</h2>
+                  <p className="checkout__otp-subtitle">
+                    Enter your phone number to receive a verification code. Returning customers get their address auto-filled!
+                  </p>
+
+                  {!otpSent ? (
+                    /* Phone Input */
+                    <div className="checkout__otp-section">
+                      <div className="checkout__otp-phone-wrap">
+                        <span className="checkout__otp-country">+91</span>
+                        <input
+                          type="tel"
+                          value={otpPhone}
+                          onChange={e => { setOtpPhone(e.target.value.replace(/\D/g, '').slice(0, 10)); setOtpError('') }}
+                          placeholder="Enter 10-digit mobile number"
+                          className="checkout__otp-phone-input"
+                          maxLength={10}
+                          autoFocus
+                        />
+                      </div>
+                      {otpError && <span className="checkout__otp-error"><AlertCircle size={14} /> {otpError}</span>}
+                      <button
+                        className="btn btn-primary btn-lg checkout__otp-send-btn"
+                        onClick={handleSendOTP}
+                        disabled={otpSending || otpPhone.length < 10}
+                      >
+                        {otpSending ? <span className="checkout__spinner"></span> : <><ArrowRight size={16} /> Send OTP</>}
+                      </button>
+                      <p className="checkout__otp-consent">
+                        <ShieldCheck size={14} /> By verifying, you agree to retrieve saved addresses via Shiprocket for faster checkout.
+                      </p>
+                    </div>
+                  ) : !otpVerified ? (
+                    /* OTP Input */
+                    <div className="checkout__otp-section">
+                      <p className="checkout__otp-sent-msg">
+                        <CheckCircle size={16} className="checkout__otp-sent-icon" /> OTP sent to <strong>+91 {otpPhone}</strong>
+                      </p>
+                      <div className="checkout__otp-input-wrap">
+                        <input
+                          ref={otpInputRef}
+                          type="text"
+                          value={otpValue}
+                          onChange={e => { setOtpValue(e.target.value.replace(/\D/g, '').slice(0, 6)); setOtpError('') }}
+                          placeholder="Enter OTP"
+                          className="checkout__otp-code-input"
+                          maxLength={6}
+                        />
+                      </div>
+                      {otpError && <span className="checkout__otp-error"><AlertCircle size={14} /> {otpError}</span>}
+                      <button
+                        className="btn btn-primary btn-lg checkout__otp-verify-btn"
+                        onClick={handleVerifyOTP}
+                        disabled={otpVerifying || otpValue.length < 4}
+                      >
+                        {otpVerifying ? <span className="checkout__spinner"></span> : <><ShieldCheck size={16} /> Verify OTP</>}
+                      </button>
+                      <div className="checkout__otp-resend">
+                        {countdown > 0 ? (
+                          <span className="checkout__otp-countdown">Resend in {countdown}s</span>
+                        ) : (
+                          <button className="checkout__otp-resend-btn" onClick={handleSendOTP} disabled={otpSending}>
+                            <RefreshCw size={14} /> Resend OTP
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    /* Verified */
+                    <div className="checkout__otp-section checkout__otp-verified">
+                      <div className="checkout__otp-verified-badge">
+                        <CheckCircle size={32} />
+                        <span>Phone Verified!</span>
+                      </div>
+                      <p>Proceeding to shipping details...</p>
+                    </div>
+                  )}
+
+                  <button className="checkout__otp-skip" onClick={handleSkipOTP}>
+                    Skip verification →
+                  </button>
+                </div>
+              )}
+
+              {/* STEP 2: SHIPPING */}
+              {currentStep === 2 && (
+                <div className="checkout__card checkout__card--animate">
                   <h2 className="checkout__card-title"><MapPin size={20} /> Shipping Information</h2>
+
+                  {/* Saved addresses from Shiprocket */}
+                  {savedAddresses.length > 1 && (
+                    <div className="checkout__saved-addresses">
+                      <p className="checkout__saved-label">📦 Saved Addresses</p>
+                      {savedAddresses.map((addr, i) => (
+                        <button
+                          key={i}
+                          className="checkout__saved-addr-btn"
+                          onClick={() => handleSelectAddress(addr)}
+                        >
+                          <strong>{addr.first_name || addr.name || 'Address'} {addr.last_name || ''}</strong>
+                          <span>{addr.address || addr.address_1}, {addr.city}, {addr.state} - {addr.pincode || addr.zip}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
 
                   <div className="checkout__row">
                     <div className="checkout__field">
@@ -263,7 +494,16 @@ const CheckoutPage = () => {
                     </div>
                     <div className="checkout__field">
                       <label>Phone *</label>
-                      <input type="tel" value={shipping.phone} onChange={e => updateShipping('phone', e.target.value)} placeholder="+91 9876543210" className={errors.phone ? 'checkout__input--error' : ''} />
+                      <input
+                        type="tel"
+                        value={shipping.phone}
+                        onChange={e => updateShipping('phone', e.target.value)}
+                        placeholder="+91 9876543210"
+                        className={errors.phone ? 'checkout__input--error' : ''}
+                        readOnly={otpVerified}
+                        style={otpVerified ? { background: '#1a1f2e', opacity: 0.7 } : {}}
+                      />
+                      {otpVerified && <span style={{ color: '#2ecc71', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px' }}><CheckCircle size={12} /> Verified</span>}
                       {errors.phone && <span className="checkout__error">{errors.phone}</span>}
                     </div>
                   </div>
@@ -302,14 +542,17 @@ const CheckoutPage = () => {
                     <span>Save this information for next time</span>
                   </label>
 
-                  <button className="btn btn-primary btn-lg checkout__next" onClick={handleNext}>
-                    Continue to Payment <ChevronRight size={18} />
-                  </button>
+                  <div className="checkout__nav-btns">
+                    <button className="btn btn-outline" onClick={() => setCurrentStep(1)}>Back</button>
+                    <button className="btn btn-primary btn-lg checkout__next" onClick={handleNext}>
+                      Continue to Payment <ChevronRight size={18} />
+                    </button>
+                  </div>
                 </div>
               )}
 
-              {/* STEP 2: PAYMENT */}
-              {currentStep === 2 && (
+              {/* STEP 3: PAYMENT */}
+              {currentStep === 3 && (
                 <div className="checkout__card checkout__card--animate">
                   <h2 className="checkout__card-title"><CreditCard size={20} /> Payment Method</h2>
 
@@ -347,7 +590,7 @@ const CheckoutPage = () => {
                   )}
 
                   <div className="checkout__nav-btns">
-                    <button className="btn btn-outline" onClick={() => setCurrentStep(1)}>Back</button>
+                    <button className="btn btn-outline" onClick={() => setCurrentStep(2)}>Back</button>
                     <button
                       className={`btn btn-primary btn-lg checkout__place-order ${placing ? 'checkout__place-order--placing' : ''}`}
                       onClick={() => {
@@ -485,3 +728,4 @@ const CheckoutPage = () => {
 }
 
 export default CheckoutPage
+

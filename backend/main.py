@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from database import create_tables, migrate_tables
-from routes import auth, products, orders, upload, reels, payment
+from routes import auth, products, orders, upload, reels, payment, shiprocket
 
 # ─── Create App ───
 app = FastAPI(
@@ -34,6 +34,7 @@ app.include_router(orders.router)
 app.include_router(upload.router)
 app.include_router(reels.router)
 app.include_router(payment.router)
+app.include_router(shiprocket.router)
 
 # ─── Startup ───
 @app.on_event("startup")
