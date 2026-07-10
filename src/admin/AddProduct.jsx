@@ -358,29 +358,22 @@ const AddProduct = () => {
                   {images.map((img, i) => (
                     <div className={`add-product__preview-item ${i === 0 ? 'add-product__preview-item--primary' : ''}`} key={img.id}>
                       <img src={img.url} alt={img.name} />
-                      {/* Position number */}
-                      <span
+                      {/* Editable position number */}
+                      <input
+                        type="number"
                         className={`add-product__preview-pos ${i === 0 ? 'add-product__preview-pos--main' : ''}`}
-                        onClick={() => makeMain(i)}
-                        title={i === 0 ? 'Main image' : 'Click to make main'}
-                      >
-                        {i === 0 ? 'Main' : i + 1}
-                      </span>
-                      {/* Reorder arrows */}
-                      {images.length > 1 && (
-                        <div className="add-product__preview-arrows">
-                          {i > 0 && (
-                            <button type="button" className="add-product__preview-arrow" onClick={() => moveImage(i, i - 1)} title="Move left">
-                              <ChevronLeft size={14} />
-                            </button>
-                          )}
-                          {i < images.length - 1 && (
-                            <button type="button" className="add-product__preview-arrow" onClick={() => moveImage(i, i + 1)} title="Move right">
-                              <ChevronRight size={14} />
-                            </button>
-                          )}
-                        </div>
-                      )}
+                        value={i + 1}
+                        min={1}
+                        max={images.length}
+                        onChange={(e) => {
+                          const newPos = parseInt(e.target.value)
+                          if (!isNaN(newPos) && newPos >= 1 && newPos <= images.length) {
+                            moveImage(i, newPos - 1)
+                          }
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                        title={`Position ${i + 1} — type a number to reorder`}
+                      />
                       <button type="button" className="add-product__preview-remove" onClick={() => removeImage(img.id)}>
                         <X size={14} />
                       </button>
