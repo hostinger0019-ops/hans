@@ -58,6 +58,8 @@ export const ProductProvider = ({ children }) => {
         stock: parseInt(product.stock) || 0,
         images: product.images || [],
         videos: product.videos || [],
+        rating: parseFloat(product.rating) || 0,
+        reviews: parseInt(product.reviews) || 0,
         status: product.status || 'published',
         featured: product.featured || false,
       })
@@ -84,6 +86,8 @@ export const ProductProvider = ({ children }) => {
         stock: parseInt(updates.stock) || 0,
         images: updates.images || [],
         videos: updates.videos || [],
+        rating: parseFloat(updates.rating) || 0,
+        reviews: parseInt(updates.reviews) || 0,
         status: updates.status || 'published',
         featured: updates.featured || false,
       })

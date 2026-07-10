@@ -34,6 +34,8 @@ const AddProduct = () => {
     sizes: [],
     colors: [],
     stock: '',
+    rating: '',
+    reviews: '',
     status: 'published',
     featured: false,
   })
@@ -65,6 +67,8 @@ const AddProduct = () => {
           sizes: product.sizes || [],
           colors: product.colors || [],
           stock: product.stock !== undefined ? String(product.stock) : '',
+          rating: product.rating ? String(product.rating) : '',
+          reviews: product.reviews ? String(product.reviews) : '',
           status: product.status || 'published',
           featured: product.featured || false,
         })
@@ -258,6 +262,8 @@ const AddProduct = () => {
         stock: parseInt(form.stock),
         images: imageUrls,
         videos: videoUrls,
+        rating: form.rating,
+        reviews: form.reviews,
       }
 
       if (isEditing) {
@@ -551,7 +557,7 @@ const AddProduct = () => {
 
             {/* Inventory */}
             <div className="add-product__card">
-              <h2 className="add-product__card-title">Inventory</h2>
+              <h2 className="add-product__card-title">Inventory & Social Proof</h2>
               <div className="add-product__field">
                 <label>Stock Quantity *</label>
                 <input
@@ -563,6 +569,34 @@ const AddProduct = () => {
                   id="product-stock"
                 />
                 {errors.stock && <span className="add-product__error">{errors.stock}</span>}
+              </div>
+              <div className="add-product__row">
+                <div className="add-product__field">
+                  <label>Rating (0-5)</label>
+                  <input
+                    type="number"
+                    value={form.rating}
+                    onChange={(e) => updateForm('rating', e.target.value)}
+                    placeholder="4.5"
+                    min="0"
+                    max="5"
+                    step="0.1"
+                    className="add-product__input"
+                    id="product-rating"
+                  />
+                </div>
+                <div className="add-product__field">
+                  <label>Reviews Count</label>
+                  <input
+                    type="number"
+                    value={form.reviews}
+                    onChange={(e) => updateForm('reviews', e.target.value)}
+                    placeholder="128"
+                    min="0"
+                    className="add-product__input"
+                    id="product-reviews"
+                  />
+                </div>
               </div>
             </div>
 

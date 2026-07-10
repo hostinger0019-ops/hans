@@ -25,6 +25,8 @@ class ProductCreate(BaseModel):
     stock: int = 0
     images: List[str] = []
     videos: List[str] = []
+    rating: float = 0.0
+    reviews: int = 0
     status: str = "published"
     featured: bool = False
 
@@ -40,6 +42,8 @@ class ProductUpdate(BaseModel):
     stock: Optional[int] = None
     images: Optional[List[str]] = None
     videos: Optional[List[str]] = None
+    rating: Optional[float] = None
+    reviews: Optional[int] = None
     status: Optional[str] = None
     featured: Optional[bool] = None
 
@@ -168,6 +172,8 @@ def create_product(
         stock=data.stock,
         images=json.dumps(data.images),
         videos=json.dumps(data.videos),
+        rating=data.rating,
+        reviews=data.reviews,
         status=data.status,
         featured=data.featured,
     )
