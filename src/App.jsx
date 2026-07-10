@@ -1,3 +1,4 @@
+/* Tarik Clothing v1.1 — Persistent uploads enabled */
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { ProductProvider } from './context/ProductContext'
