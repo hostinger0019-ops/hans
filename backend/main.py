@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from database import create_tables
+from database import create_tables, migrate_tables
 from routes import auth, products, orders, upload, reels, payment
 
 # ─── Create App ───
@@ -39,7 +39,8 @@ app.include_router(payment.router)
 @app.on_event("startup")
 def startup():
     create_tables()
-    print("✅ Database tables created")
+    migrate_tables()
+    print("✅ Database tables created & migrated")
     print("🚀 Tarik Clothing API is running!")
 
 # ─── Health Check ───

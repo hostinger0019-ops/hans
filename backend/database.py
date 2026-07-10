@@ -88,6 +88,36 @@ def create_tables():
     Base.metadata.create_all(bind=engine)
 
 
+def migrate_tables():
+    """Safely add missing columns to existing tables. No data is lost."""
+    import sqlite3
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    # Get existing columns in products table
+    cursor.execute("PRAGMA table_info(products)")
+    existing_cols = {row[1] for row in cursor.fetchall()}
+
+    # Columns to add if missing: (column_name, column_type, default_value)
+    migrations = [
+        ("rating", "FLOAT", "0.0"),
+        ("reviews", "INTEGER", "0"),
+        ("videos", "TEXT", "'[]'"),
+        ("compare_price", "FLOAT", "NULL"),
+    ]
+
+    for col_name, col_type, default in migrations:
+        if col_name not in existing_cols:
+            try:
+                cursor.execute(f"ALTER TABLE products ADD COLUMN {col_name} {col_type} DEFAULT {default}")
+                print(f"✅ Migration: Added '{col_name}' column to products table")
+            except Exception as e:
+                print(f"⚠️ Migration skip '{col_name}': {e}")
+
+    conn.commit()
+    conn.close()
+
+
 def get_db():
     db = SessionLocal()
     try:
