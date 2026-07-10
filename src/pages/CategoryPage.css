@@ -1,30 +1,18 @@
 /* ═══════════════════════════════════════════
-   Category Page — Zestora-Matched Card Design
-   Exact same sizes, spacing, and format
+   Category Page — Luxury Product Listing
+   Premium mobile-first design
    ═══════════════════════════════════════════ */
 
 .catpage {
-  --cat-bg: #09090B;
-  --cat-bg-card: rgba(255, 255, 255, 0.03);
-  --cat-accent: #8B5CF6;
-  --cat-accent-light: #A78BFA;
-  --cat-accent-text: #C4B5FD;
-  --cat-text: #FAFAFA;
-  --cat-text-muted: #A1A1AA;
-  --cat-border: rgba(255, 255, 255, 0.06);
-  --cat-radius: 12px;
-  --cat-green: #22C55E;
-
   min-height: 100vh;
-  background: var(--cat-bg);
+  background: #0a0a0a;
   padding-top: 90px;
   padding-bottom: 80px;
-  color: var(--cat-text);
 }
 
 /* ─── Header ─── */
 .catpage__header {
-  max-width: 1100px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 40px 24px 32px;
   text-align: center;
@@ -34,7 +22,7 @@
   font-family: 'Playfair Display', serif;
   font-size: clamp(2.2rem, 6vw, 4rem);
   font-weight: 700;
-  color: var(--cat-text);
+  color: #fff;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   margin: 0 0 8px;
@@ -52,226 +40,316 @@
 
 .catpage__count {
   font-size: 0.85rem;
-  color: var(--cat-text-muted);
+  color: rgba(255,255,255,0.4);
   letter-spacing: 0.15em;
   text-transform: uppercase;
   margin: 16px 0 0;
   font-weight: 400;
 }
 
-/* ─── Product Grid — Same as Zestora ─── */
+/* ─── Product Grid ─── */
 .catpage__grid {
-  max-width: 1100px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 24px 24px;
+  padding: 24px 16px;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 16px;
 }
 
-/* ─── Product Card — Exact Zestora Match ─── */
+@media (min-width: 768px) {
+  .catpage__grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+    padding: 40px 32px;
+  }
+}
+
+@media (min-width: 1100px) {
+  .catpage__grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+    padding: 40px 40px;
+  }
+}
+
+/* ─── Product Card ─── */
 .catpage__card {
-  background: var(--cat-bg-card);
-  border: 1px solid var(--cat-border);
-  border-radius: var(--cat-radius);
-  overflow: hidden;
-  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
 }
 
 .catpage__card:hover {
-  border-color: rgba(139,92,246,0.15);
-  transform: translateY(-4px);
-  box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+  transform: translateY(-6px);
 }
 
-/* Card Image — Fixed 240px height like Zestora */
+/* Card Image */
 .catpage__card-img-wrap {
   position: relative;
   display: block;
-  height: 240px;
+  aspect-ratio: 3 / 4;
   overflow: hidden;
-  background: rgba(255,255,255,0.02);
+  border-radius: 8px;
+  background: linear-gradient(135deg, #161616, #1a1a1a);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
   text-decoration: none;
+}
+
+.catpage__card-img-wrap::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.catpage__card:hover .catpage__card-img-wrap::after {
+  opacity: 1;
 }
 
 .catpage__card-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.5s ease;
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.5s ease;
+  opacity: 0;
+}
+
+.catpage__card-img[src] {
+  opacity: 1;
 }
 
 .catpage__card:hover .catpage__card-img {
-  transform: scale(1.06);
+  transform: scale(1.08);
 }
 
-/* Tag Badge — Zestora style */
-.catpage__card-tag {
+/* Badge — Sale/New */
+.catpage__card-badge {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 12px;
+  left: 12px;
   padding: 4px 10px;
-  border-radius: 6px;
-  background: var(--cat-accent);
-  color: #fff;
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   font-weight: 700;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  z-index: 2;
+  z-index: 3;
+  border-radius: 3px;
 }
 
-/* Wishlist Button — Zestora style */
+.catpage__card-badge--sale {
+  background: #d4a853;
+  color: #0a0a0a;
+}
+
+.catpage__card-badge--new {
+  background: #fff;
+  color: #0a0a0a;
+}
+
+/* Quick Add Overlay — mobile tap-friendly */
+.catpage__quick-add {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  padding: 12px;
+  display: flex;
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.catpage__card:hover .catpage__quick-add {
+  transform: translateY(0);
+}
+
+.catpage__quick-add-btn {
+  width: 100%;
+  padding: 10px 0;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  border: none;
+  border-radius: 6px;
+  color: #0a0a0a;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.catpage__quick-add-btn:hover {
+  background: #d4a853;
+}
+
+.catpage__quick-add-btn--added {
+  background: #d4a853 !important;
+}
+
+/* Wishlist Button */
 .catpage__wish {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 32px;
-  height: 32px;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background: rgba(9,9,11,0.6);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--cat-text-muted);
   cursor: pointer;
+  opacity: 0;
   transition: all 0.3s ease;
-  z-index: 2;
-  font-size: 0.85rem;
+  z-index: 3;
 }
 
-.catpage__wish:hover {
-  background: rgba(239,68,68,0.2);
-  border-color: rgba(239,68,68,0.4);
-  color: #EF4444;
+.catpage__card:hover .catpage__wish,
+.catpage__wish--active {
+  opacity: 1 !important;
 }
 
 .catpage__wish--active {
-  background: rgba(239,68,68,0.2) !important;
-  border-color: rgba(239,68,68,0.4) !important;
-  color: #EF4444 !important;
+  background: rgba(220,38,38,0.85);
 }
 
-/* ─── Card Info — Zestora spacing ─── */
+.catpage__wish:hover {
+  transform: scale(1.15);
+  background: rgba(255,255,255,0.25);
+}
+
+.catpage__wish--active:hover {
+  background: rgba(220,38,38,1);
+}
+
+/* Card Info */
 .catpage__card-info {
-  padding: 16px;
+  padding: 14px 4px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
 }
 
-.catpage__card-brand {
-  font-size: 0.7rem;
-  font-family: 'Inter', monospace;
-  color: var(--cat-accent-text);
+.catpage__card-sub {
+  font-size: 0.65rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 4px;
-  display: block;
+  letter-spacing: 0.14em;
+  color: #d4a853;
 }
 
 .catpage__card-name {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--cat-text);
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.9);
   text-decoration: none;
-  margin-bottom: 8px;
-  letter-spacing: -0.01em;
-  display: block;
   line-height: 1.35;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   transition: color 0.25s;
+  letter-spacing: 0.01em;
 }
 
 .catpage__card-name:hover {
-  color: var(--cat-accent-light);
+  color: #d4a853;
 }
 
-/* Pricing — Zestora style */
-.catpage__card-pricing {
+/* Price */
+.catpage__card-price-row {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.catpage__card-currency {
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.4);
+  font-weight: 500;
 }
 
 .catpage__card-price {
-  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
   font-weight: 700;
-  font-size: 1rem;
-  color: var(--cat-text);
+  color: #fff;
+  letter-spacing: 0.02em;
 }
 
-.catpage__card-original {
-  font-size: 0.8rem;
-  color: var(--cat-text-muted);
+.catpage__card-old {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.3);
   text-decoration: line-through;
 }
 
 .catpage__card-discount {
-  font-size: 0.75rem;
-  color: var(--cat-green);
-  font-weight: 600;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #4ade80;
+  letter-spacing: 0.02em;
 }
 
-/* Rating — Green badge like Zestora */
-.catpage__card-rating {
+/* Sizes Preview */
+.catpage__card-sizes {
   display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.75rem;
+  gap: 4px;
+  margin-top: 8px;
+  flex-wrap: wrap;
 }
 
-.catpage__card-stars {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  padding: 2px 8px;
-  border-radius: 4px;
-  background: rgba(34,197,94,0.1);
-  color: var(--cat-green);
+.catpage__card-size {
+  font-size: 0.6rem;
   font-weight: 600;
-  font-size: 0.7rem;
+  color: rgba(255,255,255,0.45);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 2px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.04em;
 }
 
-.catpage__card-stars svg {
-  fill: var(--cat-green);
-  stroke: var(--cat-green);
-}
-
-.catpage__card-reviews {
-  color: var(--cat-text-muted);
-  font-family: 'Inter', monospace;
-}
-
-/* Add to Cart — Zestora violet style */
+/* Mobile Add to Cart — always visible on mobile */
 .catpage__add-btn {
-  width: 100%;
-  padding: 10px;
-  margin-top: 12px;
-  border-radius: 8px;
-  background: rgba(139,92,246,0.1);
-  border: 1px solid rgba(139,92,246,0.2);
-  color: var(--cat-accent-text);
-  font-size: 0.8rem;
-  font-weight: 600;
+  margin-top: 10px;
+  padding: 11px 0;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 6px;
+  background: transparent;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-family: 'Inter', sans-serif;
+  display: block;
 }
 
 .catpage__add-btn:hover {
-  background: var(--cat-accent);
-  color: #fff;
-  border-color: var(--cat-accent);
+  background: #fff;
+  color: #0a0a0a;
+  border-color: #fff;
 }
 
 .catpage__add-btn--added {
-  background: var(--cat-accent) !important;
-  color: #fff !important;
-  border-color: var(--cat-accent) !important;
+  background: #d4a853;
+  border-color: #d4a853;
+  color: #0a0a0a;
 }
 
 /* ─── Loading ─── */
@@ -282,14 +360,14 @@
   justify-content: center;
   min-height: 40vh;
   gap: 16px;
-  color: var(--cat-text-muted);
+  color: rgba(255,255,255,0.5);
 }
 
 .catpage__spinner {
   width: 40px;
   height: 40px;
   border: 2px solid rgba(255,255,255,0.08);
-  border-top-color: var(--cat-accent);
+  border-top-color: #d4a853;
   border-radius: 50%;
   animation: catSpin 0.8s linear infinite;
 }
@@ -314,21 +392,21 @@
 .catpage__empty h2 {
   font-size: 1.5rem;
   font-weight: 600;
-  color: var(--cat-text);
+  color: #fff;
   margin: 10px 0 0;
 }
 
 .catpage__empty p {
   font-size: 0.95rem;
-  color: var(--cat-text-muted);
+  color: rgba(255,255,255,0.45);
   margin: 0;
 }
 
 .catpage__back-btn {
   margin-top: 20px;
   padding: 12px 32px;
-  background: var(--cat-accent);
-  color: #fff;
+  background: #d4a853;
+  color: #0a0a0a;
   text-decoration: none;
   font-size: 0.85rem;
   font-weight: 700;
@@ -339,44 +417,70 @@
 }
 
 .catpage__back-btn:hover {
-  background: var(--cat-accent-light);
+  background: #c49a45;
 }
 
-/* ─── Responsive — Same breakpoints as Zestora ─── */
-
-@media (max-width: 1024px) {
-  .catpage__grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .catpage__grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .catpage__card-img-wrap {
-    height: 220px;
-  }
-}
-
+/* ─── Mobile Tweaks ─── */
 @media (max-width: 480px) {
   .catpage {
     padding-top: 100px;
   }
 
-  .catpage__grid {
-    grid-template-columns: 1fr;
-    padding: 16px 14px;
-    gap: 14px;
+  .catpage__header {
+    padding: 24px 16px 20px;
   }
 
-  .catpage__card-img-wrap {
-    height: 280px;
+  .catpage__title {
+    font-size: 2rem;
+  }
+
+  .catpage__title::after {
+    width: 40px;
+    margin-top: 12px;
+  }
+
+  .catpage__grid {
+    padding: 16px 12px;
+    gap: 10px;
   }
 
   .catpage__card-info {
-    padding: 14px;
+    padding: 10px 2px 0;
+  }
+
+  .catpage__card-sub {
+    font-size: 0.58rem;
+  }
+
+  .catpage__card-name {
+    font-size: 0.8rem;
+  }
+
+  .catpage__card-price {
+    font-size: 0.92rem;
+  }
+
+  .catpage__wish {
+    opacity: 1;
+    width: 30px;
+    height: 30px;
+    top: 8px;
+    right: 8px;
+  }
+
+  .catpage__add-btn {
+    padding: 9px 0;
+    font-size: 0.68rem;
+    border-radius: 5px;
+  }
+
+  .catpage__card-img-wrap {
+    border-radius: 6px;
+  }
+
+  .catpage__card-size {
+    font-size: 0.55rem;
+    padding: 2px 5px;
   }
 }
 

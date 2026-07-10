@@ -5,7 +5,7 @@ import { useCart } from '../context/CartContext'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import CartDrawer from '../components/CartDrawer'
-import { Heart, Star, ShoppingBag } from 'lucide-react'
+import { Heart, ShoppingBag } from 'lucide-react'
 import './CategoryPage.css'
 
 const CategoryPage = () => {
@@ -80,8 +80,6 @@ const CategoryPage = () => {
               const discount = product.comparePrice && product.comparePrice > product.price
                 ? Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)
                 : 0
-              const rating = product.rating || 0
-              const reviews = product.reviews || 0
 
               return (
                 <div className="catpage__card" key={product.id}>
@@ -93,36 +91,37 @@ const CategoryPage = () => {
                       className="catpage__card-img"
                       loading="lazy"
                     />
-                    {/* Badge */}
-                    {discount > 0 ? (
-                      <span className="catpage__card-tag">{discount}% Off</span>
-                    ) : product.featured ? (
-                      <span className="catpage__card-tag">Bestseller</span>
-                    ) : null}
+                    {/* Sale Badge */}
+                    {discount > 0 && (
+                      <span className="catpage__card-badge catpage__card-badge--sale">
+                        {discount}% Off
+                      </span>
+                    )}
                     {/* Wishlist */}
                     <button
                       className={`catpage__wish ${wishlist.has(product.id) ? 'catpage__wish--active' : ''}`}
                       onClick={(e) => { e.preventDefault(); toggleWishlist(product.id) }}
                     >
-                      <Heart size={14} fill={wishlist.has(product.id) ? '#EF4444' : 'none'} stroke={wishlist.has(product.id) ? '#EF4444' : 'currentColor'} />
+                      <Heart size={18} fill={wishlist.has(product.id) ? '#fff' : 'none'} />
                     </button>
                   </Link>
 
                   {/* Info */}
                   <div className="catpage__card-info">
                     {product.subcategory && (
-                      <span className="catpage__card-brand">{product.subcategory}</span>
+                      <span className="catpage__card-sub">{product.subcategory}</span>
                     )}
                     <Link to={`/product/${product.id}`} className="catpage__card-name">
                       {product.name}
                     </Link>
-                    <div className="catpage__card-pricing">
+                    <div className="catpage__card-price-row">
+                      <span className="catpage__card-currency">₹</span>
                       <span className="catpage__card-price">
-                        ₹{product.price?.toLocaleString('en-IN')}
+                        {product.price?.toLocaleString('en-IN')}
                       </span>
                       {product.comparePrice && product.comparePrice > product.price && (
                         <>
-                          <span className="catpage__card-original">
+                          <span className="catpage__card-old">
                             ₹{product.comparePrice.toLocaleString('en-IN')}
                           </span>
                           <span className="catpage__card-discount">
@@ -132,17 +131,12 @@ const CategoryPage = () => {
                       )}
                     </div>
 
-                    {/* Rating */}
-                    {rating > 0 && (
-                      <div className="catpage__card-rating">
-                        <span className="catpage__card-stars">
-                          <Star size={10} /> {rating}
-                        </span>
-                        {reviews > 0 && (
-                          <span className="catpage__card-reviews">
-                            ({reviews.toLocaleString('en-IN')})
-                          </span>
-                        )}
+                    {/* Size Tags */}
+                    {product.sizes?.length > 0 && (
+                      <div className="catpage__card-sizes">
+                        {product.sizes.map(size => (
+                          <span key={size} className="catpage__card-size">{size}</span>
+                        ))}
                       </div>
                     )}
 
