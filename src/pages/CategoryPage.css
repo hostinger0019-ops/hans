@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════
-   Category Page — Luxury Product Listing
-   Premium mobile-first design
+   Category Page — Premium Product Cards
+   Zestora-inspired mobile-first design
    ═══════════════════════════════════════════ */
 
 .catpage {
@@ -47,29 +47,35 @@
   font-weight: 400;
 }
 
-/* ─── Product Grid ─── */
+/* ─── Product Grid ───
+   Mobile: 1 column (big cards like Zestora)
+   Tablet: 2 columns
+   Desktop: 3 columns (spacious, premium feel)
+   ─── */
 .catpage__grid {
-  max-width: 1400px;
+  max-width: 600px;
   margin: 0 auto;
   padding: 24px 16px;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  grid-template-columns: 1fr;
+  gap: 24px;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 600px) {
   .catpage__grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 28px;
-    padding: 40px 32px;
+    max-width: 1000px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    padding: 32px 24px;
   }
 }
 
-@media (min-width: 1100px) {
+@media (min-width: 1024px) {
   .catpage__grid {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 32px;
-    padding: 40px 40px;
+    max-width: 1300px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+    padding: 40px 32px;
   }
 }
 
@@ -77,13 +83,18 @@
 .catpage__card {
   display: flex;
   flex-direction: column;
-  background: transparent;
-  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  background: #141414;
+  border-radius: 14px;
+  overflow: hidden;
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              box-shadow 0.4s ease;
   position: relative;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
 }
 
 .catpage__card:hover {
   transform: translateY(-6px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
 }
 
 /* Card Image */
@@ -92,9 +103,7 @@
   display: block;
   aspect-ratio: 3 / 4;
   overflow: hidden;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #161616, #1a1a1a);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  background: linear-gradient(135deg, #1a1a1a, #111);
   text-decoration: none;
 }
 
@@ -129,21 +138,21 @@
 }
 
 .catpage__card:hover .catpage__card-img {
-  transform: scale(1.08);
+  transform: scale(1.06);
 }
 
-/* Badge — Sale/New */
+/* Badge — Sale/Featured */
 .catpage__card-badge {
   position: absolute;
-  top: 12px;
-  left: 12px;
-  padding: 4px 10px;
-  font-size: 0.6rem;
+  top: 14px;
+  left: 14px;
+  padding: 5px 12px;
+  font-size: 0.65rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   z-index: 3;
-  border-radius: 3px;
+  border-radius: 5px;
 }
 
 .catpage__card-badge--sale {
@@ -151,62 +160,26 @@
   color: #0a0a0a;
 }
 
+.catpage__card-badge--featured {
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  color: #fff;
+}
+
 .catpage__card-badge--new {
   background: #fff;
   color: #0a0a0a;
 }
 
-/* Quick Add Overlay — mobile tap-friendly */
-.catpage__quick-add {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 2;
-  padding: 12px;
-  display: flex;
-  transform: translateY(100%);
-  transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-.catpage__card:hover .catpage__quick-add {
-  transform: translateY(0);
-}
-
-.catpage__quick-add-btn {
-  width: 100%;
-  padding: 10px 0;
-  background: rgba(255,255,255,0.95);
-  backdrop-filter: blur(10px);
-  border: none;
-  border-radius: 6px;
-  color: #0a0a0a;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.catpage__quick-add-btn:hover {
-  background: #d4a853;
-}
-
-.catpage__quick-add-btn--added {
-  background: #d4a853 !important;
-}
-
 /* Wishlist Button */
 .catpage__wish {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 36px;
-  height: 36px;
+  top: 14px;
+  right: 14px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   border: none;
-  background: rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.35);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   color: #fff;
@@ -214,49 +187,43 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  opacity: 0;
   transition: all 0.3s ease;
   z-index: 3;
 }
 
-.catpage__card:hover .catpage__wish,
-.catpage__wish--active {
-  opacity: 1 !important;
-}
-
-.catpage__wish--active {
-  background: rgba(220,38,38,0.85);
-}
-
 .catpage__wish:hover {
-  transform: scale(1.15);
-  background: rgba(255,255,255,0.25);
+  transform: scale(1.12);
+  background: rgba(0,0,0,0.5);
+}
+
+.catpage__wish--active {
+  background: rgba(220,38,38,0.85) !important;
 }
 
 .catpage__wish--active:hover {
-  background: rgba(220,38,38,1);
+  background: rgba(220,38,38,1) !important;
 }
 
-/* Card Info */
+/* ─── Card Info ─── */
 .catpage__card-info {
-  padding: 14px 4px 0;
+  padding: 18px 20px 20px;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 6px;
 }
 
 .catpage__card-sub {
-  font-size: 0.65rem;
+  font-size: 0.68rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  color: #d4a853;
+  color: #a78bfa;
 }
 
 .catpage__card-name {
-  font-size: 0.88rem;
-  font-weight: 500;
-  color: rgba(255,255,255,0.9);
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
   text-decoration: none;
   line-height: 1.35;
   display: -webkit-box;
@@ -275,81 +242,76 @@
 .catpage__card-price-row {
   display: flex;
   align-items: baseline;
-  gap: 6px;
-  margin-top: 6px;
-}
-
-.catpage__card-currency {
-  font-size: 0.68rem;
-  color: rgba(255,255,255,0.4);
-  font-weight: 500;
+  gap: 8px;
+  margin-top: 4px;
 }
 
 .catpage__card-price {
-  font-size: 1.05rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: #fff;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
 }
 
 .catpage__card-old {
-  font-size: 0.78rem;
-  color: rgba(255,255,255,0.3);
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.35);
   text-decoration: line-through;
 }
 
 .catpage__card-discount {
-  font-size: 0.65rem;
+  font-size: 0.72rem;
   font-weight: 700;
   color: #4ade80;
   letter-spacing: 0.02em;
 }
 
-/* Sizes Preview */
-.catpage__card-sizes {
+/* Rating */
+.catpage__card-rating {
   display: flex;
-  gap: 4px;
-  margin-top: 8px;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  margin-top: 2px;
 }
 
-.catpage__card-size {
-  font-size: 0.6rem;
+.catpage__card-rating-val {
+  font-size: 0.82rem;
   font-weight: 600;
-  color: rgba(255,255,255,0.45);
-  border: 1px solid rgba(255,255,255,0.1);
-  padding: 2px 6px;
-  border-radius: 3px;
-  letter-spacing: 0.04em;
+  color: rgba(255,255,255,0.8);
 }
 
-/* Mobile Add to Cart — always visible on mobile */
+.catpage__card-rating-count {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.4);
+}
+
+/* Add to Cart Button — Prominent, filled */
 .catpage__add-btn {
-  margin-top: 10px;
-  padding: 11px 0;
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 6px;
-  background: transparent;
+  margin-top: 14px;
+  padding: 13px 0;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.08);
   color: #fff;
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
   transition: all 0.3s ease;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .catpage__add-btn:hover {
-  background: #fff;
-  color: #0a0a0a;
-  border-color: #fff;
+  background: rgba(255,255,255,0.15);
 }
 
 .catpage__add-btn--added {
-  background: #d4a853;
-  border-color: #d4a853;
-  color: #0a0a0a;
+  background: #d4a853 !important;
+  color: #0a0a0a !important;
 }
 
 /* ─── Loading ─── */
@@ -421,7 +383,7 @@
 }
 
 /* ─── Mobile Tweaks ─── */
-@media (max-width: 480px) {
+@media (max-width: 599px) {
   .catpage {
     padding-top: 100px;
   }
@@ -440,47 +402,30 @@
   }
 
   .catpage__grid {
-    padding: 16px 12px;
-    gap: 10px;
+    padding: 16px 14px;
+    gap: 20px;
+  }
+
+  .catpage__card {
+    border-radius: 12px;
   }
 
   .catpage__card-info {
-    padding: 10px 2px 0;
-  }
-
-  .catpage__card-sub {
-    font-size: 0.58rem;
+    padding: 16px 16px 18px;
   }
 
   .catpage__card-name {
-    font-size: 0.8rem;
+    font-size: 0.95rem;
   }
 
   .catpage__card-price {
-    font-size: 0.92rem;
-  }
-
-  .catpage__wish {
-    opacity: 1;
-    width: 30px;
-    height: 30px;
-    top: 8px;
-    right: 8px;
+    font-size: 1.1rem;
   }
 
   .catpage__add-btn {
-    padding: 9px 0;
-    font-size: 0.68rem;
-    border-radius: 5px;
-  }
-
-  .catpage__card-img-wrap {
-    border-radius: 6px;
-  }
-
-  .catpage__card-size {
-    font-size: 0.55rem;
-    padding: 2px 5px;
+    padding: 12px 0;
+    font-size: 0.78rem;
+    border-radius: 7px;
   }
 }
 

@@ -1,6 +1,7 @@
 /**
  * Post-build script — Creates physical folders for all SPA routes
  * so Apache/Hostinger can find them without mod_rewrite.
+ * Also copies PHP scripts and .htaccess to dist/.
  */
 import { readFileSync, writeFileSync, mkdirSync, copyFileSync } from 'fs';
 import { join, dirname } from 'path';
@@ -39,32 +40,30 @@ for (const route of routes) {
 // Also create 404.html at dist root
 writeFileSync(join(distDir, '404.html'), indexHtml);
 
-// Copy api-proxy.php into dist for Hostinger deployment
-try {
-  const proxyFile = readFileSync(join(__dirname, 'api-proxy.php'));
-  writeFileSync(join(distDir, 'api-proxy.php'), proxyFile);
-  console.log('✅ Copied api-proxy.php to dist/');
-} catch (e) {
-  console.warn('⚠️ api-proxy.php not found, skipping');
+// ─── Copy PHP scripts into dist for Hostinger deployment ───
+
+const phpFiles = ['api-proxy.php', 'upload.php', 'serve-upload.php'];
+for (const file of phpFiles) {
+  try {
+    const content = readFileSync(join(__dirname, file));
+    writeFileSync(join(distDir, file), content);
+    console.log(`✅ Copied ${file} to dist/`);
+  } catch (e) {
+    console.warn(`⚠️ ${file} not found, skipping`);
+  }
 }
 
-// Copy upload.php into dist for Hostinger file uploads
+// ─── Copy .htaccess into dist ───
 try {
-  const uploadFile = readFileSync(join(__dirname, 'upload.php'));
-  writeFileSync(join(distDir, 'upload.php'), uploadFile);
-  console.log('✅ Copied upload.php to dist/');
+  const htaccess = readFileSync(join(__dirname, '.htaccess'));
+  writeFileSync(join(distDir, '.htaccess'), htaccess);
+  console.log('✅ Copied .htaccess to dist/');
 } catch (e) {
-  console.warn('⚠️ upload.php not found, skipping');
+  console.warn('⚠️ .htaccess not found, skipping');
 }
 
-// Create persistent uploads directories with .gitkeep
-// These directories MUST exist for uploaded images/reels to persist across deploys
-const uploadDirs = ['uploads/images', 'uploads/reels'];
-for (const dir of uploadDirs) {
-  const fullDir = join(distDir, dir);
-  mkdirSync(fullDir, { recursive: true });
-  writeFileSync(join(fullDir, '.gitkeep'), '');
-}
-console.log('✅ Created uploads directories with .gitkeep');
+// NOTE: Uploads are now stored OUTSIDE public_html in /home/<user>/tarik_uploads/
+// No need to create uploads/ directories in dist — they would just get wiped on deploy anyway.
+// Files are served via serve-upload.php (rewritten by .htaccess).
 
 console.log(`✅ Created ${routes.length} route folders + 404.html in dist/`);

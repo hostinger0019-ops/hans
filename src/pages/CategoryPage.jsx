@@ -5,7 +5,7 @@ import { useCart } from '../context/CartContext'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import CartDrawer from '../components/CartDrawer'
-import { Heart, ShoppingBag } from 'lucide-react'
+import { Heart, ShoppingBag, Star } from 'lucide-react'
 import './CategoryPage.css'
 
 const CategoryPage = () => {
@@ -80,6 +80,8 @@ const CategoryPage = () => {
               const discount = product.comparePrice && product.comparePrice > product.price
                 ? Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)
                 : 0
+              const rating = product.rating || 0
+              const reviews = product.reviews || 0
 
               return (
                 <div className="catpage__card" key={product.id}>
@@ -95,6 +97,12 @@ const CategoryPage = () => {
                     {discount > 0 && (
                       <span className="catpage__card-badge catpage__card-badge--sale">
                         {discount}% Off
+                      </span>
+                    )}
+                    {/* Featured Badge */}
+                    {product.featured && !discount && (
+                      <span className="catpage__card-badge catpage__card-badge--featured">
+                        Premium
                       </span>
                     )}
                     {/* Wishlist */}
@@ -114,10 +122,11 @@ const CategoryPage = () => {
                     <Link to={`/product/${product.id}`} className="catpage__card-name">
                       {product.name}
                     </Link>
+
+                    {/* Price Row */}
                     <div className="catpage__card-price-row">
-                      <span className="catpage__card-currency">₹</span>
                       <span className="catpage__card-price">
-                        {product.price?.toLocaleString('en-IN')}
+                        ₹{product.price?.toLocaleString('en-IN')}
                       </span>
                       {product.comparePrice && product.comparePrice > product.price && (
                         <>
@@ -131,12 +140,14 @@ const CategoryPage = () => {
                       )}
                     </div>
 
-                    {/* Size Tags */}
-                    {product.sizes?.length > 0 && (
-                      <div className="catpage__card-sizes">
-                        {product.sizes.map(size => (
-                          <span key={size} className="catpage__card-size">{size}</span>
-                        ))}
+                    {/* Rating */}
+                    {rating > 0 && (
+                      <div className="catpage__card-rating">
+                        <Star size={13} fill="#c9a96e" stroke="#c9a96e" />
+                        <span className="catpage__card-rating-val">{rating}</span>
+                        {reviews > 0 && (
+                          <span className="catpage__card-rating-count">({reviews.toLocaleString()})</span>
+                        )}
                       </div>
                     )}
 
