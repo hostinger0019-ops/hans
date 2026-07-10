@@ -56,11 +56,12 @@ const ReelsMiniBar = ({ reels, onReelClick }) => {
                 <div className="reels-mini__thumb">
                   {isVideoThumb ? (
                     <video
-                      src={reel.thumbnail}
+                      src={reel.thumbnail + '#t=0.5'}
                       muted
                       playsInline
-                      preload="metadata"
-                      onLoadedData={(e) => { e.target.currentTime = 0.5 }}
+                      preload="auto"
+                      onLoadedMetadata={(e) => { e.target.currentTime = 0.5 }}
+                      onSeeked={(e) => { e.target.pause() }}
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />
                   ) : (
