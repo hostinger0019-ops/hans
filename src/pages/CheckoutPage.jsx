@@ -55,7 +55,10 @@ const CheckoutPage = () => {
   /* ─── Calculations ─── */
   const discount = promoApplied ? Math.round(cartSubtotal * 0.1) : 0
   const shippingCost = cartSubtotal >= 999 ? 0 : 99
-  const total = cartSubtotal - discount + shippingCost
+  const baseTotal = cartSubtotal - discount + shippingCost
+  const PREPAID_DISCOUNT = 70
+  const COD_CHARGE = 20
+  const total = payment.method === 'razorpay' ? baseTotal - PREPAID_DISCOUNT : baseTotal + COD_CHARGE
 
   /* ─── Promo Code ─── */
   const applyPromo = () => {
@@ -163,6 +166,7 @@ const CheckoutPage = () => {
             discount,
             shipping_cost: shippingCost,
             total,
+            prepaid_discount: PREPAID_DISCOUNT,
             payment_method: 'razorpay',
             payment_id: response.razorpay_payment_id,
             razorpay_order_id: response.razorpay_order_id,
@@ -314,7 +318,7 @@ const CheckoutPage = () => {
                       <input type="radio" name="payment" value="razorpay" checked={payment.method === 'razorpay'} onChange={() => updatePayment('method', 'razorpay')} />
                       <Zap size={18} />
                       <div>
-                        <span>Pay Online</span>
+                        <span>Pay Online <span style={{ color: '#2ecc71', fontWeight: 700, fontSize: '13px' }}>— Save ₹{PREPAID_DISCOUNT}</span></span>
                         <small>Cards, UPI, Wallets, Net Banking</small>
                       </div>
                     </label>
@@ -322,7 +326,7 @@ const CheckoutPage = () => {
                       <input type="radio" name="payment" value="cod" checked={payment.method === 'cod'} onChange={() => updatePayment('method', 'cod')} />
                       <Package size={18} />
                       <div>
-                        <span>Cash on Delivery</span>
+                        <span>Cash on Delivery <span style={{ color: '#e67e22', fontSize: '13px' }}>+₹{COD_CHARGE}</span></span>
                         <small>Pay when you receive</small>
                       </div>
                     </label>
@@ -338,7 +342,7 @@ const CheckoutPage = () => {
                   {payment.method === 'cod' && (
                     <div className="checkout__cod-note">
                       <AlertCircle size={16} />
-                      <p>A fee of ₹49 will be charged for Cash on Delivery orders.</p>
+                      <p>A handling fee of ₹{COD_CHARGE} will be charged for Cash on Delivery orders.</p>
                     </div>
                   )}
 
@@ -365,7 +369,8 @@ const CheckoutPage = () => {
                             subtotal: cartSubtotal,
                             discount,
                             shipping_cost: shippingCost,
-                            total: total + 49,
+                            total,
+                            cod_charge: COD_CHARGE,
                             payment_method: 'cod',
                           }
                           ordersAPI.create(orderData)
@@ -380,7 +385,7 @@ const CheckoutPage = () => {
                       ) : payment.method === 'razorpay' ? (
                         <><Zap size={16} /> Pay ₹{total.toLocaleString()} with Razorpay</>
                       ) : (
-                        <><Lock size={16} /> Place COD Order — ₹{(total + 49).toLocaleString()}</>
+                        <><Lock size={16} /> Place COD Order — ₹{total.toLocaleString()}</>
                       )}
                     </button>
                   </div>
@@ -446,6 +451,18 @@ const CheckoutPage = () => {
                     <span>Shipping</span>
                     <span>{shippingCost === 0 ? <span className="checkout__free">FREE</span> : `₹${shippingCost}`}</span>
                   </div>
+                  {payment.method === 'razorpay' && (
+                    <div className="checkout__total-row" style={{ color: '#2ecc71' }}>
+                      <span>Prepaid Discount</span>
+                      <span>-₹{PREPAID_DISCOUNT}</span>
+                    </div>
+                  )}
+                  {payment.method === 'cod' && (
+                    <div className="checkout__total-row" style={{ color: '#e67e22' }}>
+                      <span>COD Handling Fee</span>
+                      <span>+₹{COD_CHARGE}</span>
+                    </div>
+                  )}
                   <div className="checkout__total-row checkout__total-row--final">
                     <span>Total</span>
                     <span>₹{total.toLocaleString()}</span>
