@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
+import { useProducts } from '../context/ProductContext'
 import {
   ArrowRight,
   Truck,
@@ -31,97 +32,7 @@ import QuickViewModal from '../components/QuickViewModal'
 import { motion, useScroll, useTransform, useSpring, animate } from 'framer-motion'
 import './LandingPage.css'
 
-/* ─── Sample Product Data ─── */
-const trendingProducts = [
-  {
-    id: 1,
-    name: 'Premium Leather Jacket',
-    price: 4999,
-    originalPrice: 7999,
-    image: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=500&q=80',
-    rating: 4.8,
-    reviews: 124,
-    badge: 'Bestseller',
-    category: 'Men',
-  },
-  {
-    id: 2,
-    name: 'Oversized Graphic Tee',
-    price: 1299,
-    originalPrice: 1999,
-    image: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=500&q=80',
-    rating: 4.6,
-    reviews: 89,
-    badge: 'New',
-    category: 'Unisex',
-  },
-  {
-    id: 3,
-    name: 'Slim Fit Chinos',
-    price: 2499,
-    originalPrice: 3499,
-    image: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=500&q=80',
-    rating: 4.7,
-    reviews: 203,
-    badge: 'Trending',
-    category: 'Men',
-  },
-  {
-    id: 4,
-    name: 'Floral Wrap Dress',
-    price: 3299,
-    originalPrice: 4999,
-    image: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=500&q=80',
-    rating: 4.9,
-    reviews: 156,
-    badge: 'Hot',
-    category: 'Women',
-  },
-  {
-    id: 5,
-    name: 'Classic Denim Jacket',
-    price: 3499,
-    originalPrice: 4499,
-    image: 'https://images.unsplash.com/photo-1495105787522-5334e3ffa0ef?w=500&q=80',
-    rating: 4.5,
-    reviews: 78,
-    badge: null,
-    category: 'Unisex',
-  },
-  {
-    id: 6,
-    name: 'Silk Blend Blazer',
-    price: 5999,
-    originalPrice: 8999,
-    image: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=500&q=80',
-    rating: 4.8,
-    reviews: 67,
-    badge: 'Premium',
-    category: 'Women',
-  },
-  {
-    id: 7,
-    name: 'Cargo Joggers',
-    price: 1999,
-    originalPrice: 2999,
-    image: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=500&q=80',
-    rating: 4.4,
-    reviews: 312,
-    badge: 'Bestseller',
-    category: 'Men',
-  },
-  {
-    id: 8,
-    name: 'Cropped Hoodie',
-    price: 1799,
-    originalPrice: 2499,
-    image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500&q=80',
-    rating: 4.6,
-    reviews: 145,
-    badge: 'New',
-    category: 'Women',
-  },
-]
+
 
 const testimonials = [
   {
@@ -209,6 +120,9 @@ const Counter = ({ to, suffix = '', decimals = 0, start }) => {
 }
 
 const LandingPage = () => {
+  const { products } = useProducts()
+  const trendingProducts = products.slice(0, 8)
+
   const [heroRef, heroInView] = useInView()
   const [trustRef, trustInView] = useInView()
   const [collectionsRef, collectionsInView] = useInView()
@@ -535,15 +449,17 @@ const LandingPage = () => {
                 id={`product-card-${product.id}`}
               >
                 <div className="product-card__image-wrap">
-                  <img src={product.image} alt={product.name} className="product-card__image" loading="lazy" />
-                  {product.badge && (
-                    <span className={`product-card__badge product-card__badge--${product.badge.toLowerCase()}`}>
-                      {product.badge}
+                  <img src={product.images?.[0] || ''} alt={product.name} className="product-card__image" loading="lazy" />
+                  {product.featured && (
+                    <span className="product-card__badge product-card__badge--bestseller">
+                      Featured
                     </span>
                   )}
-                  <span className="product-card__discount">
-                    -{Math.round((1 - product.price / product.originalPrice) * 100)}%
-                  </span>
+                  {product.comparePrice && product.comparePrice > product.price && (
+                    <span className="product-card__discount">
+                      -{Math.round((1 - product.price / product.comparePrice) * 100)}%
+                    </span>
+                  )}
 
                   <div className={`product-card__actions ${hoveredProduct === product.id ? 'product-card__actions--visible' : ''}`}>
                     <button className="product-card__action" aria-label="Add to wishlist">
@@ -576,7 +492,9 @@ const LandingPage = () => {
                   </div>
                   <div className="product-card__pricing">
                     <span className="product-card__price">₹{product.price.toLocaleString()}</span>
-                    <span className="product-card__original-price">₹{product.originalPrice.toLocaleString()}</span>
+                    {product.comparePrice && (
+                      <span className="product-card__original-price">₹{product.comparePrice.toLocaleString()}</span>
+                    )}
                   </div>
                 </div>
               </Link>
