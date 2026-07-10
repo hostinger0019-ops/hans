@@ -71,7 +71,22 @@ export const ProductProvider = ({ children }) => {
 
   const updateProduct = async (id, updates) => {
     try {
-      await productsAPI.update(id, updates)
+      // Map frontend camelCase to backend snake_case
+      await productsAPI.update(id, {
+        name: updates.name,
+        description: updates.description || '',
+        price: parseFloat(updates.price),
+        compare_price: updates.comparePrice ? parseFloat(updates.comparePrice) : null,
+        category: updates.category || 'Men',
+        subcategory: updates.subcategory || '',
+        sizes: updates.sizes || [],
+        colors: updates.colors || [],
+        stock: parseInt(updates.stock) || 0,
+        images: updates.images || [],
+        videos: updates.videos || [],
+        status: updates.status || 'published',
+        featured: updates.featured || false,
+      })
     } catch (err) {
       console.warn('API update failed:', err.message)
     }
