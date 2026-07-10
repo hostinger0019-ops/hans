@@ -5,7 +5,7 @@ import { useCart } from '../context/CartContext'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import CartDrawer from '../components/CartDrawer'
-import { Heart, ShoppingBag, Star } from 'lucide-react'
+import { Heart, Star, ShoppingBag } from 'lucide-react'
 import './CategoryPage.css'
 
 const CategoryPage = () => {
@@ -93,44 +93,36 @@ const CategoryPage = () => {
                       className="catpage__card-img"
                       loading="lazy"
                     />
-                    {/* Sale Badge */}
-                    {discount > 0 && (
-                      <span className="catpage__card-badge catpage__card-badge--sale">
-                        {discount}% Off
-                      </span>
-                    )}
-                    {/* Featured Badge */}
-                    {product.featured && !discount && (
-                      <span className="catpage__card-badge catpage__card-badge--featured">
-                        Premium
-                      </span>
-                    )}
+                    {/* Badge */}
+                    {discount > 0 ? (
+                      <span className="catpage__card-tag">{discount}% Off</span>
+                    ) : product.featured ? (
+                      <span className="catpage__card-tag">Bestseller</span>
+                    ) : null}
                     {/* Wishlist */}
                     <button
                       className={`catpage__wish ${wishlist.has(product.id) ? 'catpage__wish--active' : ''}`}
                       onClick={(e) => { e.preventDefault(); toggleWishlist(product.id) }}
                     >
-                      <Heart size={18} fill={wishlist.has(product.id) ? '#fff' : 'none'} />
+                      <Heart size={14} fill={wishlist.has(product.id) ? '#EF4444' : 'none'} stroke={wishlist.has(product.id) ? '#EF4444' : 'currentColor'} />
                     </button>
                   </Link>
 
                   {/* Info */}
                   <div className="catpage__card-info">
                     {product.subcategory && (
-                      <span className="catpage__card-sub">{product.subcategory}</span>
+                      <span className="catpage__card-brand">{product.subcategory}</span>
                     )}
                     <Link to={`/product/${product.id}`} className="catpage__card-name">
                       {product.name}
                     </Link>
-
-                    {/* Price Row */}
-                    <div className="catpage__card-price-row">
+                    <div className="catpage__card-pricing">
                       <span className="catpage__card-price">
                         ₹{product.price?.toLocaleString('en-IN')}
                       </span>
                       {product.comparePrice && product.comparePrice > product.price && (
                         <>
-                          <span className="catpage__card-old">
+                          <span className="catpage__card-original">
                             ₹{product.comparePrice.toLocaleString('en-IN')}
                           </span>
                           <span className="catpage__card-discount">
@@ -143,10 +135,13 @@ const CategoryPage = () => {
                     {/* Rating */}
                     {rating > 0 && (
                       <div className="catpage__card-rating">
-                        <Star size={13} fill="#c9a96e" stroke="#c9a96e" />
-                        <span className="catpage__card-rating-val">{rating}</span>
+                        <span className="catpage__card-stars">
+                          <Star size={10} /> {rating}
+                        </span>
                         {reviews > 0 && (
-                          <span className="catpage__card-rating-count">({reviews.toLocaleString()})</span>
+                          <span className="catpage__card-reviews">
+                            ({reviews.toLocaleString('en-IN')})
+                          </span>
                         )}
                       </div>
                     )}
