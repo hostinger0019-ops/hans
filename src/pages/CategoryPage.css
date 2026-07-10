@@ -323,33 +323,55 @@
   letter-spacing: 0.04em;
 }
 
-/* Mobile Add to Cart — always visible on mobile */
+/* Add to Cart — Premium gold CTA */
 .catpage__add-btn {
   margin-top: 10px;
-  padding: 11px 0;
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 6px;
-  background: transparent;
-  color: #fff;
-  font-size: 0.72rem;
-  font-weight: 700;
+  padding: 12px 0;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #d4a853, #b8892e);
+  color: #0a0a0a;
+  font-size: 0.74rem;
+  font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   display: block;
+  width: 100%;
+  box-shadow: 0 2px 10px rgba(212,168,83,0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.catpage__add-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .catpage__add-btn:hover {
-  background: #fff;
-  color: #0a0a0a;
-  border-color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(212,168,83,0.35);
+  background: linear-gradient(135deg, #e0b966, #c9a04a);
+}
+
+.catpage__add-btn:hover::before {
+  opacity: 1;
+}
+
+.catpage__add-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(212,168,83,0.2);
 }
 
 .catpage__add-btn--added {
-  background: #d4a853;
-  border-color: #d4a853;
-  color: #0a0a0a;
+  background: linear-gradient(135deg, #22c55e, #16a34a) !important;
+  box-shadow: 0 4px 16px rgba(34,197,94,0.3) !important;
+  color: #fff !important;
 }
 
 /* ─── Loading ─── */
