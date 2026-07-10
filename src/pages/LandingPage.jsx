@@ -20,9 +20,9 @@ import {
   Mail,
   ArrowUpRight
 } from 'lucide-react'
-import heroBanner from '../assets/images/hero-banner.png'
-import collectionMen from '../assets/images/collection-men.png'
-import collectionWomen from '../assets/images/collection-women.png'
+import heroBanner from '../assets/images/hero-banner.webp'
+import collectionMen from '../assets/images/collection-men.webp'
+import collectionWomen from '../assets/images/collection-women.webp'
 import ReelsMiniBar from '../components/ReelsMiniBar'
 import ReelsViewer from '../components/ReelsViewer'
 import { sampleReels } from '../data/reelsData'
