@@ -90,11 +90,35 @@ const ProductDetail = () => {
     // Navigate to checkout (placeholder for now)
   }
 
-  const fakeReviews = [
-    { id: 1, name: 'Aisha K.', rating: 5, date: '2 weeks ago', text: 'Absolutely love the quality! The fabric feels premium and the fit is perfect. Will definitely order again.', verified: true },
-    { id: 2, name: 'Rahul S.', rating: 4, date: '1 month ago', text: 'Great product, exactly as shown in the pictures. Shipping was quick too. Just wish there were more color options.', verified: true },
-    { id: 3, name: 'Priya P.', rating: 5, date: '3 weeks ago', text: 'Best purchase this season! The material is top notch and it looks even better in person. Highly recommend.', verified: false },
+  // Generate review entries based on admin-set reviews count and rating
+  const reviewNames = [
+    'Aisha K.', 'Rahul S.', 'Priya P.', 'Vikram M.', 'Sneha R.',
+    'Arjun D.', 'Meera T.', 'Karan J.', 'Divya N.', 'Rohan B.',
+    'Ananya S.', 'Siddharth G.', 'Pooja L.', 'Amit V.', 'Neha C.',
   ]
+  const reviewTexts = [
+    'Absolutely love the quality! The fabric feels premium and the fit is perfect. Will definitely order again.',
+    'Great product, exactly as shown in the pictures. Shipping was quick too.',
+    'Best purchase this season! The material is top notch and it looks even better in person.',
+    'Very comfortable and stylish. Got compliments the first time I wore it. Highly recommend!',
+    'Perfect fit, amazing quality. The color is exactly as shown. Worth every rupee.',
+    'Exceeded my expectations. The stitching and finish are excellent for this price range.',
+    'Love the design! Ordered two more in different colors. Fast delivery too.',
+    'Super comfortable fabric, perfect for daily wear. Will buy again for sure.',
+    'Amazing value for money. Looks much more expensive than it is.',
+    'The fit is spot on and the material feels really premium. Very happy with this purchase.',
+  ]
+  const reviewDates = ['1 week ago', '2 weeks ago', '3 weeks ago', '1 month ago', '2 months ago', '3 months ago']
+  
+  const displayReviewCount = Math.min(product?.reviews || 0, 5)
+  const generatedReviews = product ? Array.from({ length: displayReviewCount }, (_, i) => ({
+    id: i + 1,
+    name: reviewNames[i % reviewNames.length],
+    rating: Math.max(3, Math.min(5, Math.round(product.rating - (i % 2 === 0 ? 0 : 1)))),
+    date: reviewDates[i % reviewDates.length],
+    text: reviewTexts[i % reviewTexts.length],
+    verified: i % 3 !== 2,
+  })) : []
 
   return (
     <>
@@ -184,7 +208,7 @@ const ProductDetail = () => {
               </div>
               <span className="pdp__rating-text">{product.rating} ({product.reviews} reviews)</span>
               <span className="pdp__rating-divider">|</span>
-              <span className="pdp__sold">500+ sold</span>
+              <span className="pdp__sold">{product.reviews > 0 ? `${product.reviews * 4}+ sold` : ''}</span>
             </div>
 
             {/* Price */}
@@ -377,7 +401,7 @@ const ProductDetail = () => {
                 </div>
 
                 <div className="pdp__reviews-list">
-                  {fakeReviews.map(review => (
+                  {generatedReviews.map(review => (
                     <div className="pdp__review" key={review.id}>
                       <div className="pdp__review-header">
                         <div className="pdp__review-avatar">{review.name.charAt(0)}</div>
