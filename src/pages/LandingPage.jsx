@@ -311,6 +311,7 @@ const LandingPage = () => {
             alt="Tarik Clothing Hero"
             className="hero__bg-image"
             style={{ y: heroBgY }}
+            fetchpriority="high"
             initial={{ scale: 1.18, filter: 'blur(10px)' }}
             animate={{ scale: 1.05, filter: 'blur(0px)' }}
             transition={{ duration: 2.4, ease: [0.16, 1, 0.3, 1] }}
@@ -462,7 +463,7 @@ const LandingPage = () => {
 
           <div className="collections__grid">
             <div className="collection-card collection-card--large" id="collection-men">
-              <img src={collectionMen} alt="Men's Collection" className="collection-card__image" />
+              <img src={collectionMen} alt="Men's Collection" className="collection-card__image" loading="lazy" />
               <div className="collection-card__overlay">
                 <span className="collection-card__tag">New Season</span>
                 <h3 className="collection-card__title">Men's Collection</h3>
@@ -474,7 +475,7 @@ const LandingPage = () => {
             </div>
 
             <div className="collection-card collection-card--large" id="collection-women">
-              <img src={collectionWomen} alt="Women's Collection" className="collection-card__image" />
+              <img src={collectionWomen} alt="Women's Collection" className="collection-card__image" loading="lazy" />
               <div className="collection-card__overlay">
                 <span className="collection-card__tag">Trending</span>
                 <h3 className="collection-card__title">Women's Collection</h3>
