@@ -1,0 +1,17 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # ─── Serve uploads from persistent storage (outside public_html) ───
+  # Rewrites /uploads/reels/file.mp4 → serve-upload.php?file=reels/file.mp4
+  RewriteRule ^uploads/(.+)$ serve-upload.php?file=$1 [L,QSA]
+
+  # ─── SPA fallback — serve index.html for all non-file routes ───
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>
+
+# Fallback: If mod_rewrite is disabled, use custom error document
+ErrorDocument 404 /index.html
