@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Film, Plus, Upload, X, Play, Trash2, Link } from 'lucide-react'
+import { Film, Plus, Upload, X, Play, Trash2, Link, Pencil } from 'lucide-react'
 import { uploadAPI, reelsAPI } from '../services/api'
 import { useProducts } from '../context/ProductContext'
 import './ReelsManager.css'
@@ -11,6 +11,11 @@ const ReelsManager = () => {
   const [showUpload, setShowUpload] = useState(false)
   const [newReel, setNewReel] = useState({ caption: '', productId: '', video: null, videoUrl: '' })
   const [uploading, setUploading] = useState(false)
+
+  // Edit state
+  const [editingReel, setEditingReel] = useState(null)
+  const [editData, setEditData] = useState({ caption: '', productId: '' })
+  const [saving, setSaving] = useState(false)
 
   // Fetch reels from backend on mount
   useEffect(() => {
@@ -59,6 +64,38 @@ const ReelsManager = () => {
       alert('Failed to upload video: ' + err.message)
     } finally {
       setUploading(false)
+    }
+  }
+
+  const openEditModal = (reel) => {
+    setEditingReel(reel)
+    setEditData({
+      caption: reel.caption || '',
+      productId: reel.productId ? String(reel.productId) : '',
+    })
+  }
+
+  const handleUpdateReel = async () => {
+    if (!editingReel || !editData.caption) return
+    setSaving(true)
+    try {
+      const selectedProduct = products.find(p => String(p.id) === String(editData.productId))
+
+      await reelsAPI.update(editingReel.id, {
+        caption: editData.caption,
+        product_id: selectedProduct?.id || null,
+        product_name: selectedProduct?.name || '',
+        product_price: selectedProduct?.price || 0,
+      })
+
+      // Refresh reels list
+      const data = await reelsAPI.list()
+      setReels(data.reels || [])
+      setEditingReel(null)
+    } catch (err) {
+      alert('Failed to update reel: ' + err.message)
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -147,6 +184,58 @@ const ReelsManager = () => {
         </div>
       )}
 
+      {/* Edit Modal */}
+      {editingReel && (
+        <div className="reels-manager__modal-overlay" onClick={() => setEditingReel(null)}>
+          <div className="reels-manager__modal" onClick={e => e.stopPropagation()}>
+            <div className="reels-manager__modal-header">
+              <h2>Edit Reel</h2>
+              <button onClick={() => setEditingReel(null)}><X size={20} /></button>
+            </div>
+
+            <div className="reels-manager__modal-body">
+              {/* Video preview (read-only) */}
+              <div className="reels-manager__video-preview">
+                <video src={editingReel.videoUrl} controls muted className="reels-manager__video" />
+              </div>
+
+              <div className="reels-manager__form-field">
+                <label>Caption *</label>
+                <textarea
+                  value={editData.caption}
+                  onChange={(e) => setEditData(prev => ({ ...prev, caption: e.target.value }))}
+                  placeholder="Write a caption for your reel..."
+                  rows={3}
+                />
+              </div>
+
+              <div className="reels-manager__form-field">
+                <label>Link to Product</label>
+                <select
+                  value={editData.productId}
+                  onChange={(e) => setEditData(prev => ({ ...prev, productId: e.target.value }))}
+                  className="reels-manager__product-select"
+                >
+                  <option value="">— Select a product —</option>
+                  {products.map(product => (
+                    <option key={product.id} value={product.id}>
+                      {product.name} — ₹{product.price?.toLocaleString('en-IN')}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="reels-manager__modal-footer">
+              <button className="btn btn-outline" onClick={() => setEditingReel(null)}>Cancel</button>
+              <button className="btn btn-primary" onClick={handleUpdateReel} disabled={!editData.caption || saving}>
+                {saving ? 'Saving...' : <><Pencil size={16} /> Save Changes</>}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Reels Grid */}
       {reels.length === 0 ? (
         <div className="reels-manager__empty">
@@ -175,6 +264,10 @@ const ReelsManager = () => {
                 )}
                 <span className="reels-manager__card-date">{reel.createdAt}</span>
               </div>
+              {/* Action buttons */}
+              <button className="reels-manager__card-edit" onClick={() => openEditModal(reel)}>
+                <Pencil size={16} />
+              </button>
               <button className="reels-manager__card-delete" onClick={() => deleteReel(reel.id)}>
                 <Trash2 size={16} />
               </button>

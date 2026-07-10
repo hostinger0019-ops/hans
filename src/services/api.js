@@ -186,6 +186,12 @@ export const reelsAPI = {
       body: JSON.stringify(reelData),
     }),
 
+  update: (id, reelData) =>
+    apiFetch(`/api/reels/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(reelData),
+    }),
+
   delete: (id) =>
     apiFetch(`/api/reels/${id}`, {
       method: 'DELETE',

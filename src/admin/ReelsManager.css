@@ -21,6 +21,10 @@
 .reels-manager__card-date { font-size: 11px; color: var(--color-text-muted); }
 .reels-manager__card-delete { position: absolute; top: 8px; right: 8px; width: 32px; height: 32px; border-radius: var(--radius-full); background: rgba(0,0,0,0.6); color: #e74c3c; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; opacity: 0; transition: opacity var(--transition-fast); }
 .reels-manager__card:hover .reels-manager__card-delete { opacity: 1; }
+.reels-manager__card-edit { position: absolute; top: 8px; right: 48px; width: 32px; height: 32px; border-radius: var(--radius-full); background: rgba(0,0,0,0.6); color: var(--color-gold); display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; opacity: 0; transition: opacity var(--transition-fast); }
+.reels-manager__card:hover .reels-manager__card-edit { opacity: 1; }
+.reels-manager__card-edit:hover { background: rgba(212,168,83,0.3); }
+.reels-manager__card-delete:hover { background: rgba(231,76,60,0.3); }
 
 /* Modal */
 .reels-manager__modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: var(--z-modal); padding: var(--space-xl); }

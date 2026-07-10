@@ -30,6 +30,13 @@ class ReelOut(BaseModel):
         from_attributes = True
 
 
+class ReelUpdate(BaseModel):
+    caption: Optional[str] = None
+    product_id: Optional[int] = None
+    product_name: Optional[str] = None
+    product_price: Optional[float] = None
+
+
 # ─── Routes ───
 
 @router.get("")
@@ -69,6 +76,24 @@ def create_reel(reel: ReelCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_reel)
     return {"success": True, "id": db_reel.id}
+
+
+@router.put("/{reel_id}")
+def update_reel(reel_id: int, data: ReelUpdate, db: Session = Depends(get_db)):
+    reel = db.query(Reel).filter(Reel.id == reel_id).first()
+    if not reel:
+        raise HTTPException(status_code=404, detail="Reel not found")
+    if data.caption is not None:
+        reel.caption = data.caption
+    if data.product_id is not None:
+        reel.product_id = data.product_id
+    if data.product_name is not None:
+        reel.product_name = data.product_name
+    if data.product_price is not None:
+        reel.product_price = data.product_price
+    db.commit()
+    db.refresh(reel)
+    return {"success": True}
 
 
 @router.delete("/{reel_id}")
