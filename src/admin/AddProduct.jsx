@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useRef, useEffect } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useProducts } from '../context/ProductContext'
 import { uploadAPI } from '../services/api'
 import {
@@ -17,9 +17,12 @@ import './AddProduct.css'
 
 const AddProduct = () => {
   const navigate = useNavigate()
-  const { addProduct } = useProducts()
+  const { id } = useParams()
+  const { addProduct, updateProduct, getProduct } = useProducts()
   const imageInputRef = useRef(null)
   const videoInputRef = useRef(null)
+
+  const isEditing = Boolean(id)
 
   const [form, setForm] = useState({
     name: '',
@@ -41,10 +44,57 @@ const AddProduct = () => {
   const [dragActive, setDragActive] = useState(false)
   const [saving, setSaving] = useState(false)
   const [errors, setErrors] = useState({})
+  const [loaded, setLoaded] = useState(false)
 
   const allSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '28', '30', '32', '34', '36', '38']
   const categories = ['Men', 'Women', 'Unisex']
   const subcategories = ['T-Shirts', 'Shirts', 'Jackets', 'Blazers', 'Pants', 'Jeans', 'Dresses', 'Skirts', 'Hoodies', 'Sweaters', 'Shorts', 'Accessories']
+
+  // Load existing product data in edit mode
+  useEffect(() => {
+    if (isEditing && !loaded) {
+      const product = getProduct(id)
+      if (product) {
+        setForm({
+          name: product.name || '',
+          description: product.description || '',
+          price: product.price ? String(product.price) : '',
+          comparePrice: product.comparePrice ? String(product.comparePrice) : '',
+          category: product.category || 'Men',
+          subcategory: product.subcategory || '',
+          sizes: product.sizes || [],
+          colors: product.colors || [],
+          stock: product.stock !== undefined ? String(product.stock) : '',
+          status: product.status || 'published',
+          featured: product.featured || false,
+        })
+
+        // Load existing images as URL-only entries (no File object)
+        if (product.images?.length > 0) {
+          setImages(product.images.map((url, i) => ({
+            id: `existing-${i}`,
+            url: url,
+            name: url.split('/').pop() || `Image ${i + 1}`,
+            size: 0,
+            file: null, // no File — already uploaded
+          })))
+        }
+
+        // Load existing videos
+        if (product.videos?.length > 0) {
+          setVideos(product.videos.map((url, i) => ({
+            id: `existing-vid-${i}`,
+            url: url,
+            name: url.split('/').pop() || `Video ${i + 1}`,
+            size: 0,
+            file: null,
+          })))
+        }
+
+        setLoaded(true)
+      }
+    }
+  }, [isEditing, id, getProduct, loaded])
 
   /* ─── Handlers ─── */
   const updateForm = (key, value) => {
@@ -110,6 +160,7 @@ const AddProduct = () => {
         url,
         name: file.name,
         size: file.size,
+        file: file,
       }])
     })
   }
@@ -137,7 +188,7 @@ const AddProduct = () => {
     if (videoFiles.length) {
       videoFiles.forEach(file => {
         const url = URL.createObjectURL(file)
-        setVideos(prev => [...prev, { id: Date.now() + Math.random(), url, name: file.name, size: file.size }])
+        setVideos(prev => [...prev, { id: Date.now() + Math.random(), url, name: file.name, size: file.size, file: file }])
       })
     }
   }
@@ -162,10 +213,11 @@ const AddProduct = () => {
 
     setSaving(true)
     try {
-      // Upload images to Hostinger
+      // Upload NEW images to Hostinger (skip already-uploaded ones)
       const imageUrls = []
       for (const img of images) {
         if (img.file) {
+          // New file — upload it
           try {
             const result = await uploadAPI.upload(img.file)
             imageUrls.push(result.url)
@@ -176,12 +228,12 @@ const AddProduct = () => {
             return
           }
         } else if (img.url && !img.url.startsWith('data:')) {
-          // Already a proper URL (not base64)
+          // Existing URL — keep it
           imageUrls.push(img.url)
         }
       }
 
-      // Upload videos to Hostinger
+      // Upload NEW videos to Hostinger
       const videoUrls = []
       for (const vid of videos) {
         if (vid.file) {
@@ -199,14 +251,21 @@ const AddProduct = () => {
         }
       }
 
-      await addProduct({
+      const productData = {
         ...form,
         price: parseFloat(form.price),
         comparePrice: form.comparePrice ? parseFloat(form.comparePrice) : null,
         stock: parseInt(form.stock),
         images: imageUrls,
         videos: videoUrls,
-      })
+      }
+
+      if (isEditing) {
+        await updateProduct(parseInt(id), productData)
+      } else {
+        await addProduct(productData)
+      }
+
       setSaving(false)
       navigate('/admin/products')
     } catch (err) {
@@ -217,6 +276,7 @@ const AddProduct = () => {
   }
 
   const formatFileSize = (bytes) => {
+    if (!bytes) return ''
     if (bytes < 1024) return bytes + ' B'
     if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB'
     return (bytes / 1048576).toFixed(1) + ' MB'
@@ -228,7 +288,7 @@ const AddProduct = () => {
         <button className="add-product__back" onClick={() => navigate('/admin/products')}>
           <ArrowLeft size={20} /> Back
         </button>
-        <h1 className="add-product__title">Add New Product</h1>
+        <h1 className="add-product__title">{isEditing ? 'Edit Product' : 'Add New Product'}</h1>
       </div>
 
       <form className="add-product__form" onSubmit={handleSubmit}>
@@ -279,7 +339,7 @@ const AddProduct = () => {
                       <button type="button" className="add-product__preview-remove" onClick={() => removeImage(img.id)}>
                         <X size={14} />
                       </button>
-                      <span className="add-product__preview-size">{formatFileSize(img.size)}</span>
+                      {img.size > 0 && <span className="add-product__preview-size">{formatFileSize(img.size)}</span>}
                     </div>
                   ))}
                   <button
@@ -318,7 +378,7 @@ const AddProduct = () => {
                         <video src={video.url} className="add-product__video-preview" muted />
                         <div className="add-product__video-info">
                           <span className="add-product__video-name">{video.name}</span>
-                          <span className="add-product__video-size">{formatFileSize(video.size)}</span>
+                          {video.size > 0 && <span className="add-product__video-size">{formatFileSize(video.size)}</span>}
                         </div>
                         <button type="button" className="add-product__video-remove" onClick={() => removeVideo(video.id)}>
                           <X size={16} />
@@ -509,7 +569,7 @@ const AddProduct = () => {
             {/* Action Buttons */}
             <div className="add-product__actions">
               <button type="submit" className={`btn btn-primary btn-lg add-product__submit ${saving ? 'add-product__submit--saving' : ''}`} disabled={saving} id="save-product-btn">
-                {saving ? <span className="add-product__spinner"></span> : <><Save size={18} /> Save Product</>}
+                {saving ? <span className="add-product__spinner"></span> : <><Save size={18} /> {isEditing ? 'Update Product' : 'Save Product'}</>}
               </button>
               <button type="button" className="btn btn-outline" onClick={() => navigate('/admin/products')}>
                 Cancel
