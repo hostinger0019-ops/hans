@@ -32,13 +32,8 @@ const ProductDetail = () => {
   const [sizeError, setSizeError] = useState(false)
   const imageRef = useRef(null)
 
-  // Extra images for gallery (since we have single images per product)
-  const allImages = product ? [
-    product.images[0],
-    product.images[0],
-    product.images[0],
-    product.images[0],
-  ] : []
+  // Use all actual uploaded images
+  const allImages = product ? product.images : []
 
   useEffect(() => {
     window.scrollTo(0, 0)
