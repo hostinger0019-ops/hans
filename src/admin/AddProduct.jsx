@@ -12,6 +12,8 @@ import {
   Eye,
   ArrowLeft,
   GripVertical,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react'
 import './AddProduct.css'
 
@@ -151,6 +153,21 @@ const AddProduct = () => {
 
   const removeImage = (id) => {
     setImages(prev => prev.filter(img => img.id !== id))
+  }
+
+  const moveImage = (fromIndex, toIndex) => {
+    if (toIndex < 0 || toIndex >= images.length) return
+    setImages(prev => {
+      const updated = [...prev]
+      const [moved] = updated.splice(fromIndex, 1)
+      updated.splice(toIndex, 0, moved)
+      return updated
+    })
+  }
+
+  const makeMain = (index) => {
+    if (index === 0) return
+    moveImage(index, 0)
   }
 
   /* ─── Video Upload ─── */
@@ -341,7 +358,29 @@ const AddProduct = () => {
                   {images.map((img, i) => (
                     <div className={`add-product__preview-item ${i === 0 ? 'add-product__preview-item--primary' : ''}`} key={img.id}>
                       <img src={img.url} alt={img.name} />
-                      {i === 0 && <span className="add-product__preview-badge">Main</span>}
+                      {/* Position number */}
+                      <span
+                        className={`add-product__preview-pos ${i === 0 ? 'add-product__preview-pos--main' : ''}`}
+                        onClick={() => makeMain(i)}
+                        title={i === 0 ? 'Main image' : 'Click to make main'}
+                      >
+                        {i === 0 ? 'Main' : i + 1}
+                      </span>
+                      {/* Reorder arrows */}
+                      {images.length > 1 && (
+                        <div className="add-product__preview-arrows">
+                          {i > 0 && (
+                            <button type="button" className="add-product__preview-arrow" onClick={() => moveImage(i, i - 1)} title="Move left">
+                              <ChevronLeft size={14} />
+                            </button>
+                          )}
+                          {i < images.length - 1 && (
+                            <button type="button" className="add-product__preview-arrow" onClick={() => moveImage(i, i + 1)} title="Move right">
+                              <ChevronRight size={14} />
+                            </button>
+                          )}
+                        </div>
+                      )}
                       <button type="button" className="add-product__preview-remove" onClick={() => removeImage(img.id)}>
                         <X size={14} />
                       </button>
